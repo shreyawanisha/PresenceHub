@@ -80,3 +80,6 @@ Thumbs.db
 
 # Environment files
 .env
+
+# Local configuration files
+src/main/resources/general.properties

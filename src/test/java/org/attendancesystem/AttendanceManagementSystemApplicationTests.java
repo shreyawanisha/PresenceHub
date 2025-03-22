@@ -1,10 +1,10 @@
-package org.attendencemanagement.attendencemanagementsystem;
+package org.attendancesystem;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AttendenceManagementSystemApplicationTests {
+class AttendanceManagementSystemApplicationTests {
 
     @Test
     void contextLoads() {

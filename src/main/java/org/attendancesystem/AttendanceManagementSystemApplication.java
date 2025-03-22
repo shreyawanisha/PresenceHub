@@ -1,13 +1,13 @@
-package org.attendencemanagement.attendencemanagementsystem;
+package org.attendancesystem;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AttendenceManagementSystemApplication {
+public class AttendanceManagementSystemApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AttendenceManagementSystemApplication.class, args);
+        SpringApplication.run(AttendanceManagementSystemApplication.class, args);
     }
 
 }
