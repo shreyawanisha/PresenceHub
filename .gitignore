@@ -13,12 +13,6 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -59,14 +53,9 @@ build/
 *.ipr
 *.iws
 out/
-target/
-
-# VS Code
-.vscode/
 
 # Maven
 log/
-target/
 release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
