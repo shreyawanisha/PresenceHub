@@ -1,10 +1,13 @@
 package org.attendance.controller;
 
 import jakarta.validation.Valid;
+import org.attendance.dto.LoginRequestDTO;
+import org.attendance.dto.LoginResponseDTO;
 import org.attendance.dto.UserRequestDTO;
 import org.attendance.service.interfaces.UserService;
 import org.attendance.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,14 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
-public class UserController {
+public class AuthController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(UserService userService, JwtUtil jwtUtil, BCryptPasswordEncoder passwordEncoder) {
+    public AuthController(UserService userService, JwtUtil jwtUtil, BCryptPasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
@@ -40,4 +43,14 @@ public class UserController {
         return ResponseEntity.ok().body(" {\"token\": \"" + token + "\"}");
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO) {
+        try{
+            userService.login(loginRequestDTO.getEmail(),loginRequestDTO.getPassword());
+            String token = jwtUtil.generateToken(loginRequestDTO.getEmail());
+            return ResponseEntity.ok(new LoginResponseDTO(token, "Login successful"));
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed: " + e.getMessage());
+        }
+    }
 }
