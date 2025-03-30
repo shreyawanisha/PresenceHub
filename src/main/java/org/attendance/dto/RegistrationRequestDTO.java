@@ -10,7 +10,7 @@ import org.attendance.enums.RoleType;
 
 @Getter
 @Setter
-public class UserRequestDTO {
+public class RegistrationRequestDTO {
     @NotBlank(message = "Username is required")
     private String username;
 
@@ -25,10 +25,10 @@ public class UserRequestDTO {
     @NotNull(message = "Role is required")
     private RoleType role;
 
-    public UserRequestDTO() {
+    public RegistrationRequestDTO() {
     }
 
-    public UserRequestDTO(String username, String email, String password, RoleType role) {
+    public RegistrationRequestDTO(String username, String email, String password, RoleType role) {
         this.username = username;
         this.email = email;
         this.password = password;

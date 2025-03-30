@@ -1,8 +1,8 @@
 package org.attendance.service.interfaces;
 
-import org.attendance.dto.UserRequestDTO;
+import org.attendance.dto.RegistrationRequestDTO;
 
 public interface UserService {
-    void registerUser(UserRequestDTO userDTO);
+    void registerUser(RegistrationRequestDTO userDTO);
     void login(String email,  String password);
 }

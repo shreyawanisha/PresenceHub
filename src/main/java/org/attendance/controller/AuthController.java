@@ -2,8 +2,8 @@ package org.attendance.controller;
 
 import jakarta.validation.Valid;
 import org.attendance.dto.LoginRequestDTO;
-import org.attendance.dto.LoginResponseDTO;
-import org.attendance.dto.UserRequestDTO;
+import org.attendance.dto.AuthResponseDTO;
+import org.attendance.dto.RegistrationRequestDTO;
 import org.attendance.service.interfaces.UserService;
 import org.attendance.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody @Valid UserRequestDTO userDTO) {
+    public ResponseEntity<?> registerUser(@RequestBody @Valid RegistrationRequestDTO userDTO) {
         // Encrypt the password before saving
         String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
         userDTO.setPassword(encryptedPassword);
@@ -40,7 +40,7 @@ public class AuthController {
 
         String token = jwtUtil.generateToken(userDTO.getEmail());
 
-        return ResponseEntity.ok().body(" {\"token\": \"" + token + "\"}");
+        return ResponseEntity.ok(new AuthResponseDTO(token, "Registration successful"));
     }
 
     @PostMapping("/login")
@@ -48,7 +48,7 @@ public class AuthController {
         try{
             userService.login(loginRequestDTO.getEmail(),loginRequestDTO.getPassword());
             String token = jwtUtil.generateToken(loginRequestDTO.getEmail());
-            return ResponseEntity.ok(new LoginResponseDTO(token, "Login successful"));
+            return ResponseEntity.ok(new AuthResponseDTO(token, "Login successful"));
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed: " + e.getMessage());
         }

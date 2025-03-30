@@ -3,7 +3,7 @@ package org.attendance.service;
 import jakarta.transaction.Transactional;
 import org.attendance.dao.RoleDAO;
 import org.attendance.dao.UserDAO;
-import org.attendance.dto.UserRequestDTO;
+import org.attendance.dto.RegistrationRequestDTO;
 import org.attendance.entity.Role;
 import org.attendance.entity.User;
 import org.attendance.service.interfaces.UserService;
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void registerUser(UserRequestDTO userDTO) {
+    public void registerUser(RegistrationRequestDTO userDTO) {
 
         Role role = roleDao.findByName(userDTO.getRole());
         if(role == null) {
