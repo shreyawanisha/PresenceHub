@@ -1,7 +1,4 @@
 package org.attendance.service.interfaces;
-
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import org.attendance.dto.RegistrationRequestDTO;
 
 public interface UserService {

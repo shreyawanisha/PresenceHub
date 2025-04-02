@@ -6,7 +6,6 @@ import java.util.List;
 
 public interface CourseService {
     void saveCourse(Course course);
-    Course findCourseById(Long id);
     List<Course> getAllCourses();
     boolean existsByCrn(String crn);
 }

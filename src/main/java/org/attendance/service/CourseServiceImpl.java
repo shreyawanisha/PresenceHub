@@ -35,9 +35,6 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public boolean existsByCrn(String crn) {
-        if (courseDAO.findByCRN(crn) != null) {
-          return true;
-        }
-        return false;
+        return courseDAO.findByCRN(crn) != null;
     }
 }
