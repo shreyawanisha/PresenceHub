@@ -29,4 +29,18 @@ public class JwtUtil {
                 .signWith(getSigningKey())
                 .compact();
     }
+
+    public boolean validateToken(String token) {
+       try {
+           Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+           return true;
+       } catch (Exception e) {
+           return false;
+       }
+    }
+
+    public String extractUsernameFromToken(String token) {
+       return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token)
+                .getBody().getSubject();
+    }
 }
