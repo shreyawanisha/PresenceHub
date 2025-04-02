@@ -14,7 +14,7 @@ import java.util.Set;
 public class Course extends BaseEntity{
 
     @Column(nullable = false, unique = true)
-    private String CRN;
+    private String crn;
 
     @Column(nullable = false)
     private String courseName;
@@ -34,9 +34,9 @@ public class Course extends BaseEntity{
     public Course() {
     }
 
-    public Course(String courseName, String CRN, String department, int semester) {
+    public Course(String courseName, String crn, String department, int semester) {
         this.courseName = courseName;
-        this.CRN = CRN;
+        this.crn = crn;
         this.department = department;
         this.semester = semester;
     }
