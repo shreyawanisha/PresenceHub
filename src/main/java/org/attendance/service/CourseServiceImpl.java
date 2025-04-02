@@ -32,4 +32,12 @@ public class CourseServiceImpl implements CourseService {
     public List<Course> getAllCourses() {
         return courseDAO.findAll();
     }
+
+    @Override
+    public boolean existsByCrn(String crn) {
+        if (courseDAO.findByCRN(crn) != null) {
+          return true;
+        }
+        return false;
+    }
 }

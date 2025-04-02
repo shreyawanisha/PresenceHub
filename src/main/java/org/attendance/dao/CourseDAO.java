@@ -8,4 +8,6 @@ public interface CourseDAO extends GenericDAO<Course> {
     void save(Course course);
     Course findById(Long id);
     List<Course> findAll();
+
+    Course findByCRN(String crn);
 }

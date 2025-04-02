@@ -32,15 +32,26 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody @Valid RegistrationRequestDTO userDTO) {
-        // Encrypt the password before saving
-        String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
-        userDTO.setPassword(encryptedPassword);
+        try {
+            // Check if user already exists
+            if (userService.existsByEmail(userDTO.getEmail())) {
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body(new AuthResponseDTO(null, "User with this email already exists."));
+            }
 
-        userService.registerUser(userDTO);
+            // Encrypt password
+            String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
+            userDTO.setPassword(encryptedPassword);
+            userService.registerUser(userDTO);
 
-        String token = jwtUtil.generateToken(userDTO.getEmail());
-
-        return ResponseEntity.ok(new AuthResponseDTO(token, "Registration successful"));
+            String token = jwtUtil.generateToken(userDTO.getEmail());
+            return ResponseEntity.ok(new AuthResponseDTO(token, "Registration successful"));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponseDTO(null, "Registration failed: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/login")
@@ -50,7 +61,7 @@ public class AuthController {
             String token = jwtUtil.generateToken(loginRequestDTO.getEmail());
             return ResponseEntity.ok(new AuthResponseDTO(token, "Login successful"));
         }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed: please check your email and password" + e.getMessage());
         }
     }
 

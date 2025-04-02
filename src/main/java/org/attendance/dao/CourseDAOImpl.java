@@ -1,6 +1,7 @@
 package org.attendance.dao;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.attendance.entity.Course;
@@ -33,5 +34,16 @@ public class CourseDAOImpl extends GenericDAOImpl<Course> implements CourseDAO {
     @Override
     public List<Course> findAll() {
         return em.createQuery("SELECT c FROM Course c", Course.class).getResultList();
+    }
+
+    @Override
+    public Course findByCRN(String crn) {
+        try {
+            return em.createQuery("SELECT c FROM Course c WHERE c.crn = :crn", Course.class)
+                    .setParameter("crn", crn)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }

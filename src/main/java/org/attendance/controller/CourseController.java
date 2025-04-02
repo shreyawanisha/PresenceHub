@@ -1,7 +1,10 @@
 package org.attendance.controller;
 
+import jakarta.validation.Valid;
+import org.attendance.dto.CourseRequestDTO;
 import org.attendance.entity.Course;
 import org.attendance.service.interfaces.CourseService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +24,20 @@ public class CourseController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> createCourse(@RequestBody Course course) {
+    public ResponseEntity<?> addCourse(@RequestBody @Valid CourseRequestDTO courseDTO) {
         try {
+            if (courseService.existsByCrn(courseDTO.getCrn())) {
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body("Course with this CRN already exists.");
+            }
+            Course course = new Course(courseDTO.getCrn(), courseDTO.getCourseName(), courseDTO.getDepartment(), courseDTO.getSemester());
             courseService.saveCourse(course);
-            return ResponseEntity.ok("Course created successfully \n" + "courseName : " + course.getCourseName()
-                    + "\ncrn : " + course.getCrn() + "\ndepartment : " + course.getDepartment() + "\nsemester : " + course.getSemester());
+            return ResponseEntity.ok("Course added successfully.");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error creating course: " + e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to add course: " + e.getMessage());
         }
     }
 

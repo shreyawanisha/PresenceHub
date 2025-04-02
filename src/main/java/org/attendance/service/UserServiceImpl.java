@@ -61,4 +61,9 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Invalid password");
         }
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userDao.findByEmail(email) != null;
+    }
 }
