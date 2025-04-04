@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Objects;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -21,7 +23,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse> handleValidation(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult().getFieldError().getDefaultMessage();
+        String message = Objects.requireNonNull(ex.getBindingResult().getFieldError()).getDefaultMessage();
         ApiResponse response = new ApiResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 message);
