@@ -3,9 +3,11 @@ package org.attendance.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
     @PersistenceContext
     protected EntityManager em;
