@@ -1,13 +1,17 @@
 package org.attendance.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.attendance.enums.Semester;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "students")
 public class Student extends BaseEntity{
 
@@ -24,15 +28,4 @@ public class Student extends BaseEntity{
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Semester semester;
-
-    public Student() {
-    }
-
-    public Student(User user, String rollNumber, String department, Semester semester) {
-        this.user = user;
-        this.rollNumber = rollNumber;
-        this.department = department;
-        this.semester = semester;
-    }
-
 }

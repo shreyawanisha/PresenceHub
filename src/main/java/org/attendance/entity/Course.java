@@ -34,11 +34,10 @@ public class Course extends BaseEntity{
     public Course() {
     }
 
-    public Course(String courseName, String crn, String department, int semester) {
-        this.courseName = courseName;
+    public Course(String crn, String courseName, String department, int semester) {
         this.crn = crn;
+        this.courseName = courseName;
         this.department = department;
         this.semester = semester;
     }
-
 }

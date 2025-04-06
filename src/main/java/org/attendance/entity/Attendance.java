@@ -36,5 +36,4 @@ public class Attendance extends BaseEntity{
         this.attendanceDate = attendanceDate;
         this.status = status;
     }
-
 }
