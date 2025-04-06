@@ -2,7 +2,8 @@ package org.attendance.dao;
 
 import org.attendance.entity.User;
 
-public interface UserDAO extends GenericDAO<User> {
+import java.util.Optional;
 
-    User findByEmail(String email);
+public interface UserDAO extends GenericDAO<User> {
+    Optional<User> findByEmail(String email);
 }

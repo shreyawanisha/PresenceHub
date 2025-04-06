@@ -2,12 +2,8 @@ package org.attendance.dao;
 
 import org.attendance.entity.Course;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface CourseDAO extends GenericDAO<Course> {
-    void save(Course course);
-    Course findById(Long id);
-    List<Course> findAll();
-
-    Course findByCRN(String crn);
+    Optional<Course> findByCRN(String crn);
 }

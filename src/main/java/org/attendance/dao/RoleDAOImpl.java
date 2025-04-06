@@ -1,8 +1,11 @@
 package org.attendance.dao;
 
+import jakarta.persistence.NoResultException;
 import org.attendance.entity.Role;
 import org.attendance.enums.RoleType;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public class RoleDAOImpl extends GenericDAOImpl<Role> implements RoleDAO {
@@ -11,13 +14,14 @@ public class RoleDAOImpl extends GenericDAOImpl<Role> implements RoleDAO {
     }
 
     @Override
-    public Role findByName(RoleType name) {
+    public Optional<Role> findByName(RoleType name) {
         try {
-            return getSession().createQuery("SELECT r FROM Role r WHERE r.name = :name", Role.class)
+            Role role = getSession().createQuery("SELECT r FROM Role r WHERE r.name = :name", Role.class)
                     .setParameter("name", name)
                     .getSingleResult();
-        } catch (Exception e) {
-            return null;
+            return Optional.of(role);
+        } catch (NoResultException e) {
+            return Optional.empty();
         }
     }
 }

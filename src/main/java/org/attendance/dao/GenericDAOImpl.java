@@ -1,15 +1,13 @@
 package org.attendance.dao;
 
-import jakarta.transaction.Transactional;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.hibernate.Session;
 
 
 import java.util.List;
+import java.util.Optional;
 
-@Repository
 public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
 
     @Autowired
@@ -26,35 +24,28 @@ public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
     }
 
     @Override
-    @Transactional
     public void save(T entity) {
         getSession().persist(entity);
     }
 
     @Override
-    public T findById(Long id) {
-        return getSession().find(entityClass, id);
+    public Optional<T> findById(Long id) {
+        return Optional.ofNullable(getSession().find(entityClass, id));
     }
 
     @Override
-    @Transactional
     public void update(T entity) {
         getSession().merge(entity);
     }
 
     @Override
-    @Transactional
     public void delete(T entity) {
         getSession().remove(entity);
     }
 
     @Override
-    @Transactional
     public void deleteById(Long id) {
-        T entity = findById(id);
-        if (entity != null) {
-            getSession().remove(entity);
-        }
+        findById(id).ifPresent(entity -> getSession().remove(entity));
     }
 
     @Override

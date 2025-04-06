@@ -1,7 +1,10 @@
 package org.attendance.dao;
 
+import jakarta.persistence.NoResultException;
 import org.attendance.entity.Faculty;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public class FacultyDAOImpl extends GenericDAOImpl<Faculty> implements FacultyDAO {
@@ -11,13 +14,14 @@ public class FacultyDAOImpl extends GenericDAOImpl<Faculty> implements FacultyDA
     }
 
     @Override
-    public Faculty findByUserId(long userId) {
+    public Optional<Faculty> findByUserId(long userId) {
         try {
-            return getSession().createQuery("SELECT f FROM Faculty f WHERE f.user.id = :userId", Faculty.class)
+            Faculty faculty = getSession().createQuery("SELECT f FROM Faculty f WHERE f.user.id = :userId", Faculty.class)
                     .setParameter("userId", userId)
                     .getSingleResult();
-        } catch (Exception e) {
-            throw new RuntimeException("Faculty not found with userId: " + userId, e);
+            return Optional.of(faculty);
+        } catch (NoResultException e) {
+            return Optional.empty();
         }
     }
 }

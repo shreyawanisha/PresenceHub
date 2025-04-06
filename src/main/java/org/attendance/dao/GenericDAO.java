@@ -1,6 +1,7 @@
 package org.attendance.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface GenericDAO<T> {
     void save(T entity);
@@ -9,7 +10,7 @@ public interface GenericDAO<T> {
 
     void delete(T entity);
 
-    T findById(Long id);
+    Optional<T> findById(Long id);
 
     List<T> findAll();
 
