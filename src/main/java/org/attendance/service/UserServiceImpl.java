@@ -28,11 +28,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void registerUser(RegistrationRequestDTO userDTO) {
+        Role role = roleDao.findByName(userDTO.getRole())
+                .orElseThrow(() -> new RuntimeException("Invalid role: " + userDTO.getRole()));
 
-        Role role = roleDao.findByName(userDTO.getRole());
-        if(role == null) {
-            throw new RuntimeException("Invalid role: " + userDTO.getRole());
-        }
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
@@ -45,15 +43,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void login(String email, String password) {
-        try{
-        User user = userDao.findByEmail(email);
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
+        User user = userDao.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found, please check your email or password"));
+
         validatePassword(user, password);
-        } catch (Exception e) {
-            throw new RuntimeException("Login failed: " + e.getMessage());
-        }
     }
 
     private void validatePassword(User user, String password) {
@@ -64,6 +57,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean existsByEmail(String email) {
-        return userDao.findByEmail(email) != null;
+        return userDao.findByEmail(email).isPresent();
+    }
+
+    @Override
+    public User getByEmail(String email) {
+        return userDao.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("This user doesn't exist, please register first"));
     }
 }

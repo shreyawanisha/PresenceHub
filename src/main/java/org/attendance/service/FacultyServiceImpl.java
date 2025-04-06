@@ -3,11 +3,14 @@ package org.attendance.service;
 import org.attendance.dao.FacultyDAO;
 import org.attendance.dao.UserDAO;
 import org.attendance.dto.FacultyRequestDTO;
+import org.attendance.dto.FacultyResponseDTO;
 import org.attendance.entity.Faculty;
 import org.attendance.entity.User;
+import org.attendance.enums.RoleType;
 import org.attendance.service.interfaces.FacultyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -23,37 +26,50 @@ public class FacultyServiceImpl implements FacultyService {
         this.userDAO = userDAO;
     }
 
+    @Transactional
     @Override
-    public void createFaculty(FacultyRequestDTO facultyRequestDTO) {
-        User user = userDAO.findById(facultyRequestDTO.getUserId());
+    public User createFaculty(FacultyRequestDTO dto) {
+        User user = (userDAO.findById(dto.getUserId()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + facultyRequestDTO.getUserId());
-        }
-
-        if (!user.getRole().getName().name().equals("FACULTY")) {
+        if (user.getRole().getName() != RoleType.FACULTY) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not have FACULTY role");
         }
 
-        if (facultyDAO.findByUserId(facultyRequestDTO.getUserId()) != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Faculty already exists for this user");
+        if (facultyDAO.findByUserId(dto.getUserId()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Faculty already exists");
         }
 
         Faculty faculty = new Faculty();
         faculty.setUser(user);
-        faculty.setDepartment(facultyRequestDTO.getDepartment());
+        faculty.setDepartment(dto.getDepartment());
 
         facultyDAO.save(faculty);
+        return user;
     }
 
     @Override
-    public List<Faculty> getAllFaculty() {
-        return facultyDAO.findAll();
+    @Transactional(readOnly = true)
+    public List<FacultyResponseDTO> getAllFaculty() {
+        return facultyDAO.findAll().stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     @Override
-    public Faculty getFacultyByUserId(Long userId) {
-        return facultyDAO.findByUserId(userId);
+    @Transactional(readOnly = true)
+    public FacultyResponseDTO getFacultyByUserId(Long userId) {
+        Faculty faculty = facultyDAO.findByUserId(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Faculty not found for user ID: " + userId));
+        return mapToDto(faculty);
     }
 
+    private FacultyResponseDTO mapToDto(Faculty faculty) {
+        FacultyResponseDTO dto = new FacultyResponseDTO();
+        dto.setId(faculty.getId());
+        dto.setDepartment(faculty.getDepartment());
+        dto.setEmail(faculty.getUser().getEmail());
+        dto.setUsername(faculty.getUser().getUsername());
+        return dto;
+    }
 }

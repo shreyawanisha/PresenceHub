@@ -1,12 +1,13 @@
 package org.attendance.service.interfaces;
 
 import org.attendance.dto.FacultyRequestDTO;
-import org.attendance.entity.Faculty;
+import org.attendance.dto.FacultyResponseDTO;
+import org.attendance.entity.User;
 
 import java.util.List;
 
 public interface FacultyService {
-    void createFaculty(FacultyRequestDTO facultyDTO);
-    List<Faculty> getAllFaculty();
-    Faculty getFacultyByUserId(Long id);
+    User createFaculty(FacultyRequestDTO facultyDTO);
+    List<FacultyResponseDTO> getAllFaculty();
+    FacultyResponseDTO getFacultyByUserId(Long id);
 }

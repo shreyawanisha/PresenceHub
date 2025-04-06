@@ -7,6 +7,7 @@ import org.attendance.service.interfaces.CourseService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -30,6 +31,11 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public boolean existsByCrn(String crn) {
-        return courseDAO.findByCRN(crn) != null;
+        return courseDAO.findByCRN(crn).isPresent();
+    }
+
+    @Override
+    public Optional<Course> getById(Long id) {
+        return courseDAO.findById(id);
     }
 }
