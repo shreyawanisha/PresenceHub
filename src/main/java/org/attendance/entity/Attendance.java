@@ -21,11 +21,11 @@ public class Attendance extends BaseEntity{
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "attendance_date")
     private LocalDate attendanceDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false , name = "status")
     private AttendanceStatus status;
 
     public Attendance() {}

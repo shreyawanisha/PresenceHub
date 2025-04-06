@@ -15,7 +15,7 @@ public class Student extends BaseEntity{
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, name = "roll_number")
     private String rollNumber;
 
     @Column(nullable = false)

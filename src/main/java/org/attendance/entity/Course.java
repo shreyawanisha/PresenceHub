@@ -16,7 +16,7 @@ public class Course extends BaseEntity{
     @Column(nullable = false, unique = true)
     private String crn;
 
-    @Column(nullable = false)
+    @Column(name = "course_name", nullable = false)
     private String courseName;
 
     @Column(nullable = false)

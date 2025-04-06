@@ -20,10 +20,10 @@ public class Enrollment extends BaseEntity{
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    @Column(nullable = false)
+    @Column(name = "enrollment_start_date", nullable = false)
     private LocalDate enrollmentStartDate;
 
-    @Column(nullable = true)
+    @Column(nullable = true, name = "enrollment_end_date")
     private LocalDate enrollmentEndDate;
 
     public Enrollment() {

@@ -12,9 +12,10 @@ public abstract class BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected long id;
 
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false)
     protected LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
     protected LocalDateTime updatedAt;
 
     @PrePersist
