@@ -1,8 +1,6 @@
 package org.attendance.config;
 
-import org.attendance.dao.UserDAO;
 import org.attendance.security.JwtAuthenticationFilter;
-import org.attendance.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

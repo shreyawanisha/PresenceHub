@@ -47,7 +47,7 @@ public class FacultyController {
     public ResponseEntity<?> getFacultyByUserId(@PathVariable Long userId) {
         FacultyResponseDTO dto = facultyService.getFacultyByUserId(userId);
         if (dto == null) {
-            boolean userExists = userDAO.findById(userId) != null;
+            boolean userExists = userDAO.findById(userId).isPresent();
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     userExists ? "Faculty not created yet for user ID: " + userId
