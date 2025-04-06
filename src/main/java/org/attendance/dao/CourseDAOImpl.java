@@ -1,10 +1,9 @@
 package org.attendance.dao;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.attendance.entity.Course;
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,34 +11,31 @@ import java.util.List;
 @Repository
 public class CourseDAOImpl extends GenericDAOImpl<Course> implements CourseDAO {
 
-    @PersistenceContext
-    private EntityManager em;
-
-
     public CourseDAOImpl() {
         super(Course.class);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void save(Course course) {
-        em.persist(course);
+        final Session session = getSession();
+        session.persist(course);
     }
 
     @Override
     public Course findById(Long id) {
-        return em.find(Course.class, id);
+        return getSession().find(Course.class, id);
     }
 
     @Override
     public List<Course> findAll() {
-        return em.createQuery("SELECT c FROM Course c", Course.class).getResultList();
+        return getSession().createQuery("FROM Course", Course.class).getResultList();
     }
 
     @Override
     public Course findByCRN(String crn) {
         try {
-            return em.createQuery("SELECT c FROM Course c WHERE c.crn = :crn", Course.class)
+            return getSession().createQuery("FROM Course c WHERE c.crn = :crn", Course.class)
                     .setParameter("crn", crn)
                     .getSingleResult();
         } catch (NoResultException e) {

@@ -1,16 +1,19 @@
 package org.attendance.dao;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.hibernate.Session;
+
 
 import java.util.List;
 
 @Repository
 public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
-    @PersistenceContext
-    protected EntityManager em;
+
+    @Autowired
+    private SessionFactory sessionFactory;
 
     private final Class<T> entityClass;
 
@@ -18,27 +21,31 @@ public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
         this.entityClass = entityClass;
     }
 
+    protected Session getSession() {
+        return sessionFactory.getCurrentSession();
+    }
+
     @Override
     @Transactional
     public void save(T entity) {
-        em.persist(entity);
+        getSession().persist(entity);
     }
 
     @Override
     public T findById(Long id) {
-        return em.find(entityClass, id);
+        return getSession().find(entityClass, id);
     }
 
     @Override
     @Transactional
     public void update(T entity) {
-        em.merge(entity);
+        getSession().merge(entity);
     }
 
     @Override
     @Transactional
     public void delete(T entity) {
-        em.remove(entity);
+        getSession().remove(entity);
     }
 
     @Override
@@ -46,12 +53,12 @@ public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
     public void deleteById(Long id) {
         T entity = findById(id);
         if (entity != null) {
-            em.remove(entity);
+            getSession().remove(entity);
         }
     }
 
     @Override
     public List<T> findAll() {
-        return em.createQuery("SELECT e FROM " + entityClass.getSimpleName() + " e", entityClass).getResultList();
+        return getSession().createQuery("FROM " + entityClass.getSimpleName(), entityClass).getResultList();
     }
 }

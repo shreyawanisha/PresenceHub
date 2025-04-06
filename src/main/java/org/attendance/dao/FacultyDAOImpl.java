@@ -13,11 +13,11 @@ public class FacultyDAOImpl extends GenericDAOImpl<Faculty> implements FacultyDA
     @Override
     public Faculty findByUserId(long userId) {
         try {
-            return em.createQuery("SELECT f FROM Faculty f WHERE f.user.id = :userId", Faculty.class)
+            return getSession().createQuery("SELECT f FROM Faculty f WHERE f.user.id = :userId", Faculty.class)
                     .setParameter("userId", userId)
                     .getSingleResult();
         } catch (Exception e) {
-            return null;
+            throw new RuntimeException("Faculty not found with userId: " + userId, e);
         }
     }
 }

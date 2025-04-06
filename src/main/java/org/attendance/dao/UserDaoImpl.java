@@ -13,7 +13,7 @@ public class UserDaoImpl extends GenericDAOImpl<User> implements UserDAO {
     @Override
     public User findByEmail(String email) {
        try{
-           final TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class);
+           final TypedQuery<User> query = getSession().createQuery("SELECT u FROM User u WHERE u.email = :email", User.class);
            query.setParameter("email", email);
               return query.getSingleResult();
        }catch (Exception e){

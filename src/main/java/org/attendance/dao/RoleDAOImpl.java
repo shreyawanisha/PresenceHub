@@ -13,7 +13,7 @@ public class RoleDAOImpl extends GenericDAOImpl<Role> implements RoleDAO {
     @Override
     public Role findByName(RoleType name) {
         try {
-            return em.createQuery("SELECT r FROM Role r WHERE r.name = :name", Role.class)
+            return getSession().createQuery("SELECT r FROM Role r WHERE r.name = :name", Role.class)
                     .setParameter("name", name)
                     .getSingleResult();
         } catch (Exception e) {
