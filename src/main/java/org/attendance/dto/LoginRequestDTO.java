@@ -2,11 +2,15 @@ package org.attendance.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class LoginRequestDTO {
 
     @Email
@@ -15,10 +19,4 @@ public class LoginRequestDTO {
     @NotBlank(message = "Password is required")
     private String password;
 
-    public LoginRequestDTO() {
-    }
-    public LoginRequestDTO(String email, String password) {
-        this.email = email;
-        this.password = password;
-    }
 }
