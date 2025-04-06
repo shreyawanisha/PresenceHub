@@ -1,6 +1,9 @@
 package org.attendance.util;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
@@ -31,12 +34,19 @@ public class JwtUtil {
     }
 
     public boolean validateToken(String token) {
-       try {
-           Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
-           return true;
-       } catch (Exception e) {
-           return false;
-       }
+        try {
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            System.out.println("⚠️ Token expired");
+        } catch (MalformedJwtException e) {
+            System.out.println("⚠️ Malformed token");
+        } catch (UnsupportedJwtException e) {
+            System.out.println("⚠️ Unsupported token");
+        } catch (Exception e) {
+            System.out.println("⚠️ Invalid token: " + e.getMessage());
+        }
+        return false;
     }
 
     public String extractUsernameFromToken(String token) {

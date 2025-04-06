@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -39,18 +40,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null && jwtUtil.validateToken(token)) {
             String email = jwtUtil.extractUsernameFromToken(token);
+            Optional<User> optionalUser = userDao.findByEmail(email);
 
-            User user = userDao.findByEmail(email);
-            if (user != null) {
+            optionalUser.ifPresent(user -> {
                 String roleName = "ROLE_" + user.getRole().getName();
-                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roleName);
 
+                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roleName);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(user, null, Collections.singleton(authority));
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            });
         }
 
         filterChain.doFilter(request, response);

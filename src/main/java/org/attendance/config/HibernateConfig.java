@@ -46,6 +46,7 @@ public class HibernateConfig {
         props.setProperty("hibernate.hbm2ddl.auto", "update");
         props.setProperty("hibernate.show_sql", "true");
         props.setProperty("hibernate.format_sql", "true");
+        props.setProperty("hibernate.enable_lazy_load_no_trans", "true");
 
         // Use snake_case naming convention
         props.setProperty("hibernate.physical_naming_strategy",
