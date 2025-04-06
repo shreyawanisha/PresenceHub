@@ -3,6 +3,7 @@ package org.attendance.controller;
 import jakarta.validation.Valid;
 import org.attendance.dto.ApiResponse;
 import org.attendance.dto.CourseRequestDTO;
+import org.attendance.dto.CourseResponseDTO;
 import org.attendance.entity.Course;
 import org.attendance.service.interfaces.CourseService;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,17 @@ public class CourseController {
     @GetMapping
     public ResponseEntity<?> getAllCourses() {
         List<Course> courses = courseService.getAllCourses();
-        return ResponseEntity.ok(courses);
+
+        List<CourseResponseDTO> courseList = courses.stream()
+                .map(course -> new CourseResponseDTO(
+                        course.getId(),
+                        course.getCrn(),
+                        course.getCourseName(),
+                        course.getDepartment(),
+                        course.getSemester()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(courseList);
     }
 }

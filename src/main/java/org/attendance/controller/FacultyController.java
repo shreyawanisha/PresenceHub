@@ -3,11 +3,12 @@ package org.attendance.controller;
 import org.attendance.dao.UserDAO;
 import org.attendance.dto.ApiResponse;
 import org.attendance.dto.FacultyRequestDTO;
-import org.attendance.entity.Faculty;
+import org.attendance.dto.FacultyResponseDTO;
 import org.attendance.entity.User;
 import org.attendance.service.interfaces.FacultyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,12 +26,12 @@ public class FacultyController {
         this.userDAO = userDAO;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createFaculty(@RequestBody FacultyRequestDTO facultyDTO) {
-            facultyService.createFaculty(facultyDTO);
-            final User user = userDAO.findById(facultyDTO.getUserId());
+        final User user = facultyService.createFaculty(facultyDTO);
         final String message = String.format(
-                "Faculty created successfully :\n UserId: %d\n User email: %s\n Department: %s",
+                "Faculty created successfully:\n UserId: %d\n User email: %s\n Department: %s",
                 user.getId(), user.getEmail(), facultyDTO.getDepartment()
         );
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), message));
@@ -38,17 +39,21 @@ public class FacultyController {
 
     @GetMapping
     public ResponseEntity<?> getAllFaculties() {
-       final List<Faculty> faculties = facultyService.getAllFaculty();
-       return  ResponseEntity.ok(faculties);
+        final List<FacultyResponseDTO> faculties = facultyService.getAllFaculty();
+        return ResponseEntity.ok(faculties);
     }
-
 
     @GetMapping("/{userId}")
     public ResponseEntity<?> getFacultyByUserId(@PathVariable Long userId) {
-        Faculty faculty = facultyService.getFacultyByUserId(userId);
-        if (faculty == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Faculty not found for user ID: " + userId);
+        FacultyResponseDTO dto = facultyService.getFacultyByUserId(userId);
+        if (dto == null) {
+            boolean userExists = userDAO.findById(userId) != null;
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    userExists ? "Faculty not created yet for user ID: " + userId
+                            : "User not found with ID: " + userId
+            );
         }
-        return ResponseEntity.ok(faculty);
+        return ResponseEntity.ok(dto);
     }
 }
