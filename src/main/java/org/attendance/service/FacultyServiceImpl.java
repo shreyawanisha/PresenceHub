@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
+@Transactional
 public class FacultyServiceImpl implements FacultyService {
 
     private final FacultyDAO facultyDAO;
@@ -26,7 +27,6 @@ public class FacultyServiceImpl implements FacultyService {
         this.userDAO = userDAO;
     }
 
-    @Transactional
     @Override
     public User createFaculty(FacultyRequestDTO dto) {
         User user = (userDAO.findById(dto.getUserId()))

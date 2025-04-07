@@ -4,10 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.attendance.dao.UserDAO;
-import org.attendance.entity.User;
 import org.attendance.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,18 +14,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Optional;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserDAO userDao;
 
-    @Autowired
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDAO userDao) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
-        this.userDao = userDao;
     }
 
     @Override
@@ -40,18 +33,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null && jwtUtil.validateToken(token)) {
             String email = jwtUtil.extractUsernameFromToken(token);
-            Optional<User> optionalUser = userDao.findByEmail(email);
+            String role = jwtUtil.extractRoleFromToken(token);
 
-            optionalUser.ifPresent(user -> {
-                String roleName = "ROLE_" + user.getRole().getName();
+            String roleName = "ROLE_" + role; // Spring Security format
+            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roleName);
 
-                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roleName);
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(user, null, Collections.singleton(authority));
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(email, null, Collections.singleton(authority));
 
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            });
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);

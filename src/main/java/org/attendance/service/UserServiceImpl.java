@@ -1,6 +1,6 @@
 package org.attendance.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.attendance.dao.RoleDAO;
 import org.attendance.dao.UserDAO;
 import org.attendance.dto.RegistrationRequestDTO;
@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserDAO userDao;
@@ -26,7 +27,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public void registerUser(RegistrationRequestDTO userDTO) {
         Role role = roleDao.findByName(userDTO.getRole())
                 .orElseThrow(() -> new RuntimeException("Invalid role: " + userDTO.getRole()));
@@ -41,7 +41,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public void login(String email, String password) {
         User user = userDao.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found, please check your email or password"));

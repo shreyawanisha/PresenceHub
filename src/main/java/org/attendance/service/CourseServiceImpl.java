@@ -1,6 +1,6 @@
 package org.attendance.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.attendance.dao.CourseDAO;
 import org.attendance.entity.Course;
 import org.attendance.service.interfaces.CourseService;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+@Transactional
 @Service
 public class CourseServiceImpl implements CourseService {
 
@@ -18,7 +19,6 @@ public class CourseServiceImpl implements CourseService {
         this.courseDAO = courseDAO;
     }
 
-    @Transactional
     @Override
     public void saveCourse(Course course) {
         courseDAO.save(course);

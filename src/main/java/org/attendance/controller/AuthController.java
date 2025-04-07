@@ -36,7 +36,8 @@ public class AuthController {
         userDTO.setPassword(encryptedPassword);
 
         userService.registerUser(userDTO);
-        String token = jwtUtil.generateToken(userDTO.getEmail());
+
+        String token = jwtUtil.generateToken(userDTO.getEmail(), userDTO.getRole().name());
 
         return ResponseEntity.ok(new AuthResponseDTO(token, "Registration successful"));
     }
@@ -45,7 +46,10 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO) {
         try {
             userService.login(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
-            String token = jwtUtil.generateToken(loginRequestDTO.getEmail());
+
+            String role = userService.getByEmail(loginRequestDTO.getEmail()).getRole().getName().name();
+            String token = jwtUtil.generateToken(loginRequestDTO.getEmail(), role);
+
             return ResponseEntity.ok(new AuthResponseDTO(token, "Login successful"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
