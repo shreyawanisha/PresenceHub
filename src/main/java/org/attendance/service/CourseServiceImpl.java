@@ -1,7 +1,7 @@
 package org.attendance.service;
 
 import org.attendance.dao.FacultyDAO;
-import org.attendance.dto.AssignCourseToFacultyRequestDTO;
+import org.attendance.dto.response.AssignCourseToFacultyRequestDTO;
 import org.attendance.entity.Faculty;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;

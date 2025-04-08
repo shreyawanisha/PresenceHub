@@ -3,7 +3,7 @@ package org.attendance.service;
 import org.springframework.transaction.annotation.Transactional;
 import org.attendance.dao.RoleDAO;
 import org.attendance.dao.UserDAO;
-import org.attendance.dto.RegistrationRequestDTO;
+import org.attendance.dto.request.RegistrationRequestDTO;
 import org.attendance.entity.Role;
 import org.attendance.entity.User;
 import org.attendance.service.interfaces.UserService;

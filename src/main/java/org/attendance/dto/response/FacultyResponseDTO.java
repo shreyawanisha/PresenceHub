@@ -1,4 +1,4 @@
-package org.attendance.dto;
+package org.attendance.dto.response;
 
 public class FacultyResponseDTO {
     private Long id;

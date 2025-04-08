@@ -1,4 +1,4 @@
-package org.attendance.dto;
+package org.attendance.dto.response;
 
 import java.util.List;
 

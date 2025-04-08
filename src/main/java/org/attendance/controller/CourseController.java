@@ -1,7 +1,11 @@
 package org.attendance.controller;
 
 import jakarta.validation.Valid;
-import org.attendance.dto.*;
+import org.attendance.dto.request.CourseRequestDTO;
+import org.attendance.dto.response.ApiResponse;
+import org.attendance.dto.response.AssignCourseToFacultyRequestDTO;
+import org.attendance.dto.response.CourseResponseDTO;
+import org.attendance.dto.response.FacultyResponseDTO;
 import org.attendance.entity.Course;
 import org.attendance.service.interfaces.CourseService;
 import org.springframework.http.HttpStatus;

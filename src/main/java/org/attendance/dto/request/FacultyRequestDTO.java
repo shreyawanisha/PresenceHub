@@ -1,4 +1,4 @@
-package org.attendance.dto;
+package org.attendance.dto.request;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

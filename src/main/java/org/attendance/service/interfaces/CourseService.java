@@ -1,6 +1,6 @@
 package org.attendance.service.interfaces;
 
-import org.attendance.dto.AssignCourseToFacultyRequestDTO;
+import org.attendance.dto.response.AssignCourseToFacultyRequestDTO;
 import org.attendance.entity.Course;
 
 import java.util.List;

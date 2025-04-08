@@ -2,8 +2,8 @@ package org.attendance.service;
 
 import org.attendance.dao.FacultyDAO;
 import org.attendance.dao.UserDAO;
-import org.attendance.dto.FacultyRequestDTO;
-import org.attendance.dto.FacultyResponseDTO;
+import org.attendance.dto.request.FacultyRequestDTO;
+import org.attendance.dto.response.FacultyResponseDTO;
 import org.attendance.entity.Faculty;
 import org.attendance.entity.User;
 import org.attendance.enums.RoleType;

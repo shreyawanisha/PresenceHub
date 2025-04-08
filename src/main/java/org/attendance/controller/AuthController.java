@@ -1,7 +1,10 @@
 package org.attendance.controller;
 
 import jakarta.validation.Valid;
-import org.attendance.dto.*;
+import org.attendance.dto.request.LoginRequestDTO;
+import org.attendance.dto.request.RegistrationRequestDTO;
+import org.attendance.dto.response.ApiResponse;
+import org.attendance.dto.response.AuthResponseDTO;
 import org.attendance.service.interfaces.UserService;
 import org.attendance.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;

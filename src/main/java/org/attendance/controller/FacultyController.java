@@ -1,9 +1,9 @@
 package org.attendance.controller;
 
 import org.attendance.dao.UserDAO;
-import org.attendance.dto.ApiResponse;
-import org.attendance.dto.FacultyRequestDTO;
-import org.attendance.dto.FacultyResponseDTO;
+import org.attendance.dto.response.ApiResponse;
+import org.attendance.dto.request.FacultyRequestDTO;
+import org.attendance.dto.response.FacultyResponseDTO;
 import org.attendance.entity.User;
 import org.attendance.service.interfaces.FacultyService;
 import org.springframework.http.HttpStatus;

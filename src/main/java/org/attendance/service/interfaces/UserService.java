@@ -1,5 +1,5 @@
 package org.attendance.service.interfaces;
-import org.attendance.dto.RegistrationRequestDTO;
+import org.attendance.dto.request.RegistrationRequestDTO;
 import org.attendance.entity.User;
 
 public interface UserService {

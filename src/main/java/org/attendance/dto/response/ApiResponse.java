@@ -1,4 +1,4 @@
-package org.attendance.dto;
+package org.attendance.dto.response;
 
 public class ApiResponse {
     private final int statusCode;

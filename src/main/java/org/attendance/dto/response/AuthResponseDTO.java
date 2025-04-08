@@ -1,4 +1,4 @@
-package org.attendance.dto;
+package org.attendance.dto.response;
 
 public class AuthResponseDTO {
     private String token;
