@@ -3,15 +3,7 @@ package org.attendance.dto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
 public class FacultyRequestDTO {
 
     @NotNull(message = "User ID is required")
@@ -21,4 +13,27 @@ public class FacultyRequestDTO {
     @NotBlank(message = "Department is required")
     private String department;
 
+    public FacultyRequestDTO() {
+    }
+
+    public FacultyRequestDTO(Long userId, String department) {
+        this.userId = userId;
+        this.department = department;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
 }

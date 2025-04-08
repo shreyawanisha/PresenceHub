@@ -1,11 +1,8 @@
 package org.attendance.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 
-@Getter
 @MappedSuperclass
 public abstract class BaseEntity {
     @Id
@@ -27,5 +24,17 @@ public abstract class BaseEntity {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }

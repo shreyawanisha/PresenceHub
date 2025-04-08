@@ -1,14 +1,9 @@
 package org.attendance.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "faculties")
 public class Faculty extends BaseEntity{
@@ -29,5 +24,35 @@ public class Faculty extends BaseEntity{
     public Faculty(User user, String department) {
         this.user = user;
         this.department = department;
+    }
+
+    public Faculty(User user, String department, Set<Course> courses) {
+        this.user = user;
+        this.department = department;
+        this.courses = courses;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
     }
 }

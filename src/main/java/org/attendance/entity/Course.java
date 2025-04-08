@@ -1,14 +1,9 @@
 package org.attendance.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "courses")
 public class Course extends BaseEntity{
@@ -39,5 +34,45 @@ public class Course extends BaseEntity{
         this.courseName = courseName;
         this.department = department;
         this.semester = semester;
+    }
+
+    public String getCrn() {
+        return crn;
+    }
+
+    public void setCrn(String crn) {
+        this.crn = crn;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public Integer getSemester() {
+        return semester;
+    }
+
+    public void setSemester(Integer semester) {
+        this.semester = semester;
+    }
+
+    public Set<Faculty> getFaculties() {
+        return faculties;
+    }
+
+    public void setFaculties(Set<Faculty> faculties) {
+        this.faculties = faculties;
     }
 }
