@@ -19,8 +19,8 @@ import java.util.List;
 @Transactional
 public class StudentServiceImpl implements StudentService {
 
-    private StudentDAO studentDAO;
-    private UserDAO userDAO;
+    private final StudentDAO studentDAO;
+    private final UserDAO userDAO;
 
     public StudentServiceImpl(StudentDAO studentDAO, UserDAO userDAO) {
         this.studentDAO = studentDAO;
