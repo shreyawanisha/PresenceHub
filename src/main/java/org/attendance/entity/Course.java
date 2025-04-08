@@ -1,6 +1,8 @@
 package org.attendance.entity;
 
 import jakarta.persistence.*;
+import org.attendance.enums.Semester;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +20,7 @@ public class Course extends BaseEntity{
     private String department;
 
     @Column(nullable = false)
-    private Integer semester;
+    private Semester semester;
 
     @ManyToMany
     @JoinTable(name = "course_faculty",
@@ -29,7 +31,7 @@ public class Course extends BaseEntity{
     public Course() {
     }
 
-    public Course(String crn, String courseName, String department, int semester) {
+    public Course(String crn, String courseName, String department, Semester semester) {
         this.crn = crn;
         this.courseName = courseName;
         this.department = department;
@@ -60,11 +62,11 @@ public class Course extends BaseEntity{
         this.department = department;
     }
 
-    public Integer getSemester() {
+    public Semester getSemester() {
         return semester;
     }
 
-    public void setSemester(Integer semester) {
+    public void setSemester(Semester semester) {
         this.semester = semester;
     }
 

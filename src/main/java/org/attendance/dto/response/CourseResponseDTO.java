@@ -1,5 +1,7 @@
 package org.attendance.dto.response;
 
+import org.attendance.enums.Semester;
+
 import java.util.List;
 
 public class CourseResponseDTO {
@@ -7,13 +9,13 @@ public class CourseResponseDTO {
     private String crn;
     private String courseName;
     private String department;
-    private Integer semester;
+    private Semester semester;
     private List<FacultyResponseDTO> faculties;
 
     public CourseResponseDTO() {
     }
 
-    public CourseResponseDTO(Long id, String crn, String courseName, String department, Integer semester, List<FacultyResponseDTO> faculties) {
+    public CourseResponseDTO(Long id, String crn, String courseName, String department, Semester semester, List<FacultyResponseDTO> faculties) {
         this.id = id;
         this.crn = crn;
         this.courseName = courseName;
@@ -54,11 +56,11 @@ public class CourseResponseDTO {
         this.department = department;
     }
 
-    public Integer getSemester() {
+    public Semester getSemester() {
         return semester;
     }
 
-    public void setSemester(Integer semester) {
+    public void setSemester(Semester semester) {
         this.semester = semester;
     }
 

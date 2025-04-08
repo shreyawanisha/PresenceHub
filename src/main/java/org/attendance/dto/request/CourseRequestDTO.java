@@ -1,6 +1,6 @@
 package org.attendance.dto.request;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import org.attendance.enums.Semester;
 
 public class CourseRequestDTO {
 
@@ -13,13 +13,12 @@ public class CourseRequestDTO {
     @NotBlank(message = "Department is required")
     private String department;
 
-    @NotNull(message = "Semester is required")
-    private Integer semester;
+    private Semester semester;
 
     public CourseRequestDTO() {
     }
 
-    public CourseRequestDTO(String crn, String courseName, String department, Integer semester) {
+    public CourseRequestDTO(String crn, String courseName, String department, Semester semester) {
         this.crn = crn;
         this.courseName = courseName;
         this.department = department;
@@ -38,7 +37,7 @@ public class CourseRequestDTO {
         return department;
     }
 
-    public Integer getSemester() {
+    public Semester getSemester() {
         return semester;
     }
 
@@ -54,7 +53,7 @@ public class CourseRequestDTO {
         this.department = department;
     }
 
-    public void setSemester(Integer semester) {
+    public void setSemester(Semester semester) {
         this.semester = semester;
     }
 }
