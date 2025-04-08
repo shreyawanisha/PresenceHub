@@ -1,21 +1,25 @@
 package org.attendance.dto;
 
+import java.util.List;
+
 public class CourseResponseDTO {
     private Long id;
     private String crn;
     private String courseName;
     private String department;
     private Integer semester;
+    private List<FacultyResponseDTO> faculties;
 
     public CourseResponseDTO() {
     }
 
-    public CourseResponseDTO(Long id, String crn, String courseName, String department, Integer semester) {
+    public CourseResponseDTO(Long id, String crn, String courseName, String department, Integer semester, List<FacultyResponseDTO> faculties) {
         this.id = id;
         this.crn = crn;
         this.courseName = courseName;
         this.department = department;
         this.semester = semester;
+        this.faculties = faculties;
     }
 
     public Long getId() {
@@ -56,5 +60,13 @@ public class CourseResponseDTO {
 
     public void setSemester(Integer semester) {
         this.semester = semester;
+    }
+
+    public List<FacultyResponseDTO> getFaculties() {
+        return faculties;
+    }
+
+    public void setFaculties(List<FacultyResponseDTO> faculties) {
+        this.faculties = faculties;
     }
 }

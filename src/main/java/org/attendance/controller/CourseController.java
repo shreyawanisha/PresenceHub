@@ -1,10 +1,7 @@
 package org.attendance.controller;
 
 import jakarta.validation.Valid;
-import org.attendance.dto.ApiResponse;
-import org.attendance.dto.AssignCourseToFacultyRequestDTO;
-import org.attendance.dto.CourseRequestDTO;
-import org.attendance.dto.CourseResponseDTO;
+import org.attendance.dto.*;
 import org.attendance.entity.Course;
 import org.attendance.service.interfaces.CourseService;
 import org.springframework.http.HttpStatus;
@@ -44,17 +41,28 @@ public class CourseController {
     public ResponseEntity<?> getAllCourses() {
         List<Course> courses = courseService.getAllCourses();
 
-        List<CourseResponseDTO> courseList = courses.stream()
+        final List<CourseResponseDTO> courseList = getCourseResponseDTOList(courses);
+
+        return ResponseEntity.ok(courseList);
+    }
+
+    private static List<CourseResponseDTO> getCourseResponseDTOList(List<Course> courses) {
+        return courses.stream()
                 .map(course -> new CourseResponseDTO(
                         course.getId(),
                         course.getCrn(),
                         course.getCourseName(),
                         course.getDepartment(),
-                        course.getSemester()
+                        course.getSemester(),
+                        course.getFaculties().stream()
+                                .map(faculty -> new FacultyResponseDTO(
+                                        faculty.getUser().getId(),
+                                        faculty.getDepartment(),
+                                        faculty.getUser().getEmail(),
+                                        faculty.getUser().getUsername()))
+                                .toList()
                 ))
                 .toList();
-
-        return ResponseEntity.ok(courseList);
     }
 
     @PostMapping("/assign-faculties")
