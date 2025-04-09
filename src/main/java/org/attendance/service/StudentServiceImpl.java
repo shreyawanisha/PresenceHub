@@ -1,14 +1,16 @@
 package org.attendance.service;
 
+import org.attendance.dao.EnrollmentDAO;
+import org.attendance.dao.FacultyDAO;
 import org.attendance.dao.StudentDAO;
 import org.attendance.dao.UserDAO;
 import org.attendance.dto.request.StudentRequestDTO;
 import org.attendance.dto.response.StudentResponseDTO;
-import org.attendance.entity.Student;
-import org.attendance.entity.User;
+import org.attendance.entity.*;
 import org.attendance.enums.RoleType;
 import org.attendance.service.interfaces.StudentService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,10 +23,14 @@ public class StudentServiceImpl implements StudentService {
 
     private final StudentDAO studentDAO;
     private final UserDAO userDAO;
+    private final FacultyDAO facultyDAO;
+    private final EnrollmentDAO enrollmentDAO;
 
-    public StudentServiceImpl(StudentDAO studentDAO, UserDAO userDAO) {
+    public StudentServiceImpl(StudentDAO studentDAO, UserDAO userDAO, FacultyDAO facultyDAO, EnrollmentDAO enrollmentDAO) {
         this.studentDAO = studentDAO;
         this.userDAO = userDAO;
+        this.facultyDAO = facultyDAO;
+        this.enrollmentDAO = enrollmentDAO;
     }
 
     @Override
@@ -62,6 +68,29 @@ public class StudentServiceImpl implements StudentService {
         Student student = studentDAO.findByUserId(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found for user ID: " + userId));
         return mapToDto(student);
+    }
+
+    @Override
+    public List<StudentResponseDTO> getStudentsVisibleToCurrentUser() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (user.getRole().getName() == RoleType.ADMIN) {
+            return getAllStudents();
+        }
+        if (user.getRole().getName() == RoleType.FACULTY) {
+            Faculty faculty = facultyDAO.findByUserId(user.getId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Faculty not found for user ID: " + user.getId()));
+
+            List<Long> courseIds = faculty.getCourses().stream()
+                    .map(Course::getId)
+                    .toList();
+            List<Enrollment> enrollments = enrollmentDAO.findByCourseIdIs(courseIds);
+            return enrollments.stream()
+                    .map(Enrollment::getStudent).distinct()
+                    .map(this::mapToDto)
+                    .toList();
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized access");
     }
 
     private StudentResponseDTO mapToDto(Student student) {

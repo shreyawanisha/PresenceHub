@@ -9,4 +9,6 @@ public interface StudentService {
     void registerStudent(StudentRequestDTO dto);
     List<StudentResponseDTO> getAllStudents();
     StudentResponseDTO getByUserId(Long userId);
+
+    List<StudentResponseDTO> getStudentsVisibleToCurrentUser();
 }

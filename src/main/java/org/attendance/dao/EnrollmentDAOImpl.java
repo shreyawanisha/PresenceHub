@@ -37,4 +37,11 @@ public class EnrollmentDAOImpl extends GenericDAOImpl<Enrollment> implements Enr
     public List<Enrollment> findByStudentId(long studentId) {
         return getSession().createQuery("FROM Enrollment e where e.student.id = :studentId", Enrollment.class).setParameter("studentId", studentId).getResultList();
     }
+
+    @Override
+    public List<Enrollment> findByCourseIdIs(List<Long> courseIds) {
+        return getSession().createQuery("FROM Enrollment e where e.course.id IN :courseIds", Enrollment.class)
+                .setParameter("courseIds", courseIds)
+                .getResultList();
+    }
 }

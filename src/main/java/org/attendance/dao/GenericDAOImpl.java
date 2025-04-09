@@ -19,6 +19,10 @@ public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
         this.entityClass = entityClass;
     }
 
+    protected SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
     protected Session getSession() {
         return sessionFactory.getCurrentSession();
     }

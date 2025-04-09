@@ -10,4 +10,5 @@ public interface EnrollmentDAO extends GenericDAO<Enrollment> {
     List<Enrollment> findByCourseId(long courseId);
     List<Enrollment> findByStudentId(long studentId);
 
+    List<Enrollment> findByCourseIdIs(List<Long> courseIds);
 }

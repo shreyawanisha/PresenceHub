@@ -33,11 +33,11 @@ public class StudentController {
             return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), message));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FACULTY')")
     @GetMapping
     public ResponseEntity<?> getAllStudents() {
         try {
-            List<StudentResponseDTO> allStudents = studentService.getAllStudents();
+            List<StudentResponseDTO> allStudents = studentService.getStudentsVisibleToCurrentUser();
             return ResponseEntity.ok(allStudents);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error fetching students", e);
