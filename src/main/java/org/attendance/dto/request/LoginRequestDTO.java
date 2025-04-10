@@ -2,10 +2,12 @@ package org.attendance.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import org.attendance.validation.NortheasternEmail;
 
 public class LoginRequestDTO {
 
     @Email
+    @NortheasternEmail
     @NotBlank(message = "Email is required")
     private String email;
     @NotBlank(message = "Password is required")

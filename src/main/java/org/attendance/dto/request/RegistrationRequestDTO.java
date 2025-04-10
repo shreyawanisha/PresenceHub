@@ -5,12 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.attendance.enums.RoleType;
+import org.attendance.validation.NortheasternEmail;
 
 public class RegistrationRequestDTO {
     @NotBlank(message = "Username is required")
     private String username;
 
     @Email
+    @NortheasternEmail
     @NotBlank(message = "Email is required")
     private String email;
 
