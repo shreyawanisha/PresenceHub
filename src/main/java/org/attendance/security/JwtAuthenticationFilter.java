@@ -30,26 +30,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
         String token = extractTokenFromRequest(request);
-
         if (token != null && jwtUtil.validateToken(token)) {
             String email = jwtUtil.extractUsernameFromToken(token);
             String role = jwtUtil.extractRoleFromToken(token);
 
             userDAO.findByEmail(email).ifPresent(user -> {
-                String roleName = "ROLE_" + role;
-                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roleName);
+                String roleName = "ROLE_" + role; // e.g. "ROLE_ADMIN"
+                // Build the authority
+                SimpleGrantedAuthority authority =
+                        new SimpleGrantedAuthority(roleName);
 
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(user, null, Collections.singleton(authority));
+                        new UsernamePasswordAuthenticationToken(
+                                user, null, Collections.singleton(authority)
+                        );
 
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource()
+                                .buildDetails(request)
+                );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             });
         }
-
         filterChain.doFilter(request, response);
     }
 

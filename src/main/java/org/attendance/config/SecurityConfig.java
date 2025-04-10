@@ -11,7 +11,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
@@ -26,13 +25,37 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/login",
-                                "/api/users/register",
-                                "/api/users/logout").permitAll()
+                        // Public JSP routes
+                        .requestMatchers("/", "/home", "/login", "/register").permitAll()
+                        .requestMatchers("/WEB-INF/views/**").permitAll()
+
+                        // Static resources
+                        .requestMatchers("/images/**", "/css/**", "/js/**").permitAll()
+
+                        // Public API endpoints
+                        .requestMatchers("/api/users/login", "/api/users/register", "/api/users/logout").permitAll()
+
+                        // Everything else needs auth
                         .anyRequest().authenticated()
                 )
+
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/", true)
+                        .permitAll()
+                )
+
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll()
+                )
+
+                // JWT Filter before username-password filter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
