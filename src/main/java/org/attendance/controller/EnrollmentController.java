@@ -5,11 +5,16 @@ import org.attendance.dto.request.EnrollmentRequestDTO;
 import org.attendance.dto.response.ApiResponse;
 import org.attendance.dto.response.CourseResponseDTO;
 import org.attendance.dto.response.StudentResponseDTO;
+import org.attendance.entity.User;
 import org.attendance.service.interfaces.EnrollmentService;
+import org.attendance.service.interfaces.StudentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -17,9 +22,11 @@ import java.util.List;
 @RequestMapping("api/enrollments")
 public class EnrollmentController {
     private final EnrollmentService enrollmentService;
+    private final StudentService studentService;
 
-    public EnrollmentController(EnrollmentService enrollmentService) {
+    public EnrollmentController(EnrollmentService enrollmentService, StudentService studentService) {
         this.enrollmentService = enrollmentService;
+        this.studentService = studentService;
     }
 
     @PostMapping
@@ -42,5 +49,20 @@ public class EnrollmentController {
     @PreAuthorize("hasAnyRole('ADMIN', 'FACULTY')")
     public ResponseEntity<List<CourseResponseDTO>> getCoursesByStudent(@PathVariable Long studentId) {
         return ResponseEntity.ok(enrollmentService.getCoursesByStudent(studentId));
+    }
+
+    @GetMapping("/my-courses")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<List<CourseResponseDTO>> getCoursesForCurrentStudent() {
+        Long studentId = getCurrentStudentId();
+        return ResponseEntity.ok(enrollmentService.getCoursesByStudent(studentId));
+    }
+
+    private Long getCurrentStudentId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof User user) {
+            return studentService.getByEmail(user.getEmail()).getId();
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
     }
 }

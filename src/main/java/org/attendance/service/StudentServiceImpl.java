@@ -93,6 +93,13 @@ public class StudentServiceImpl implements StudentService {
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized access");
     }
 
+    @Override
+    public StudentResponseDTO getByEmail(String email) {
+        Student student = studentDAO.findByUserEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found with email: " + email));
+        return mapToDto(student);
+    }
+
     private StudentResponseDTO mapToDto(Student student) {
         StudentResponseDTO dto = new StudentResponseDTO();
         dto.setId(student.getId());

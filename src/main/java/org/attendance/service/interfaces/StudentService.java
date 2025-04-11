@@ -11,4 +11,6 @@ public interface StudentService {
     StudentResponseDTO getByUserId(Long userId);
 
     List<StudentResponseDTO> getStudentsVisibleToCurrentUser();
+
+    StudentResponseDTO getByEmail(String email);
 }

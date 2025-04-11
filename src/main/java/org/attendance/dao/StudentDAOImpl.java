@@ -24,4 +24,11 @@ public class StudentDAOImpl extends GenericDAOImpl<Student> implements StudentDA
                 .setParameter("rollNumber", rollNumber)
                 .uniqueResultOptional();
     }
+
+    @Override
+    public Optional<Student> findByUserEmail(String email) {
+        return getSession().createQuery("FROM Student s WHERE s.user.email = :email", Student.class)
+                .setParameter("email", email)
+                .uniqueResultOptional();
+    }
 }
