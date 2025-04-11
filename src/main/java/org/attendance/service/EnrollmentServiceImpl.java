@@ -4,6 +4,7 @@ import org.attendance.dao.CourseDAO;
 import org.attendance.dao.EnrollmentDAO;
 import org.attendance.dao.StudentDAO;
 import org.attendance.dto.response.CourseResponseDTO;
+import org.attendance.dto.response.FacultyResponseDTO;
 import org.attendance.dto.response.StudentResponseDTO;
 import org.attendance.entity.Course;
 import org.attendance.entity.Enrollment;
@@ -90,6 +91,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         dto.setCourseName(course.getCourseName());
         dto.setDepartment(course.getDepartment());
         dto.setSemester(course.getSemester());
+        dto.setFaculties(course.getFaculties().stream()
+                .map(faculty -> new FacultyResponseDTO(
+                        faculty.getUser().getId(),
+                        faculty.getDepartment(),
+                        faculty.getUser().getEmail(),
+                        faculty.getUser().getUsername()))
+                .collect(Collectors.toList()));
         return dto;
     }
 }
