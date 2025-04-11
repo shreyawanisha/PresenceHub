@@ -30,11 +30,12 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // Public JSP routes
-                        .requestMatchers("/", "/home", "/login", "/register").permitAll()
-                        .requestMatchers("/WEB-INF/views/**").permitAll()
-
-                        // Static resources
-                        .requestMatchers("/images/**", "/css/**", "/js/**").permitAll()
+                        .requestMatchers(
+                                "/", "/home", "/login", "/register",
+                                "/student/**", "/admin/**", "/faculty/**",
+                                "/WEB-INF/views/**",
+                                "/images/**", "/css/**", "/js/**"
+                        ).permitAll()
 
                         // Public API endpoints
                         .requestMatchers("/api/users/login", "/api/users/register", "/api/users/logout").permitAll()
