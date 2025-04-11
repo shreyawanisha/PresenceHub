@@ -89,12 +89,17 @@
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 const role = payload.role;
 
-                if (role === 'ADMIN') {
+                const normalizedRole = role.toUpperCase();  // normalize to match check
+                console.log("Redirecting to dashboard for role:", normalizedRole);
+
+                if (normalizedRole === 'ADMIN') {
                     window.location.href = "/admin/dashboard";
-                } else if (role === 'FACULTY') {
+                } else if (normalizedRole === 'FACULTY') {
                     window.location.href = "/faculty/dashboard";
-                } else {
+                } else if (normalizedRole === 'STUDENT') {
                     window.location.href = "/student/dashboard";
+                } else {
+                    errorEl.textContent = "Unrecognized role. Please contact admin.";
                 }
 
             } catch (e) {
