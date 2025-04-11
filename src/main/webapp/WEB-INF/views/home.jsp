@@ -66,23 +66,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/">PresenceHub</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav" aria-controls="navbarNav"
-                aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-            <div class="navbar-nav" id="auth-links">
-                <a class="nav-link" href="/login">Login</a>
-                <a class="nav-link" href="/register">Register</a>
-            </div>
-        </div>
-    </div>
-</nav>
+<jsp:include page="fragments/navbar.jsp" />
 
 <!-- Main Section -->
 <div class="main-content">
@@ -104,10 +88,7 @@
     </div>
 </div>
 
-<!-- Footer -->
-<footer class="text-center text-muted">
-    <p class="mb-0">&copy; 2025 PresenceHub. Built with ❤️ by Shreya.</p>
-</footer>
+<jsp:include page="fragments/footer.jsp" />
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -126,10 +107,10 @@
         }
 
         // Show toast message if loggedOut flag is set
-        if (sessionStorage.getItem("loggedOut")) {
-            showToast("You have been logged out successfully.");
-            sessionStorage.removeItem("loggedOut");
-        }
+        // if (sessionStorage.getItem("loggedOut")) {
+        //     showToast("You have been logged out successfully.");
+        //     sessionStorage.removeItem("loggedOut");
+        // }
     });
 
     function logout() {
@@ -138,30 +119,30 @@
         window.location.href = "/";
     }
 
-    function showToast(message) {
-        const toast = document.createElement("div");
-        toast.className = "toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-4";
-        toast.setAttribute("role", "alert");
-        toast.setAttribute("aria-live", "assertive");
-        toast.setAttribute("aria-atomic", "true");
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">
-                    ${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                        data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        `;
-        document.body.appendChild(toast);
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
+    <%--function showToast(message) {--%>
+    <%--    const toast = document.createElement("div");--%>
+    <%--    toast.className = "toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-4";--%>
+    <%--    toast.setAttribute("role", "alert");--%>
+    <%--    toast.setAttribute("aria-live", "assertive");--%>
+    <%--    toast.setAttribute("aria-atomic", "true");--%>
+    <%--    toast.innerHTML = `--%>
+    <%--        <div class="d-flex">--%>
+    <%--            <div class="toast-body">--%>
+    <%--                ${message}--%>
+    <%--            </div>--%>
+    <%--            <button type="button" class="btn-close btn-close-white me-2 m-auto"--%>
+    <%--                    data-bs-dismiss="toast" aria-label="Close"></button>--%>
+    <%--        </div>--%>
+    <%--    `;--%>
+    <%--    document.body.appendChild(toast);--%>
+    <%--    const bsToast = new bootstrap.Toast(toast);--%>
+    <%--    bsToast.show();--%>
 
-        // Auto remove after shown
-        toast.addEventListener("hidden.bs.toast", () => {
-            document.body.removeChild(toast);
-        });
-    }
+    <%--    // Auto remove after shown--%>
+    <%--    toast.addEventListener("hidden.bs.toast", () => {--%>
+    <%--        document.body.removeChild(toast);--%>
+    <%--    });--%>
+    <%--}--%>
 </script>
 </body>
 </html>

@@ -78,6 +78,8 @@
   </form>
 </div>
 
+<jsp:include page="fragments/footer.jsp" />
+
 <script>
   document.getElementById("registerForm").addEventListener("submit", function (e) {
     e.preventDefault();

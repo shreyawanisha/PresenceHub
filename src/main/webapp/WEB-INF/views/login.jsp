@@ -8,15 +8,30 @@
         body {
             background: #f0f2f5;
             font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin-top: auto;
         }
 
         .login-container {
-            max-width: 400px;
-            margin: 80px auto;
-            padding: 30px;
+            /*max-width: 470px;*/
+            /*margin: 80px auto;*/
+            /*padding: 30px;*/
+            /*background: white;*/
+            /*border-radius: 12px;*/
+            /*box-shadow: 0 0 25px rgba(0,0,0,0.1);*/
+
+            max-width: 500px;
+            min-height: 400px; /* gives it a tall feel */
+            margin: auto auto 40px; /* centers it vertically & adds space from footer */
+            padding: 10px 30px 0px;
             background: white;
             border-radius: 12px;
             box-shadow: 0 0 25px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .error-message {
@@ -50,6 +65,8 @@
         <div id="error" class="error-message text-center"></div>
     </form>
 </div>
+
+<jsp:include page="fragments/footer.jsp" />
 
 <script>
     document.getElementById("email").addEventListener("input", function () {
