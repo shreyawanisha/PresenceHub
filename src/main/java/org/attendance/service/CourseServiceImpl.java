@@ -25,12 +25,10 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseDAO courseDAO;
     private final FacultyDAO facultyDAO;
-    private final UserDAO userDao;
 
     public CourseServiceImpl(CourseDAO courseDAO, FacultyDAO facultyDAO, UserDAO userDao) {
         this.courseDAO = courseDAO;
         this.facultyDAO = facultyDAO;
-        this.userDao = userDao;
     }
 
     @Override

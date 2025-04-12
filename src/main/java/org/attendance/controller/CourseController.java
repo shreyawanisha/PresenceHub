@@ -80,4 +80,16 @@ public class CourseController {
                     .body(new ApiResponse(e.getStatusCode().value(), e.getReason()));
         }
     }
+
+    @PreAuthorize("hasRole('FACULTY')")
+    @GetMapping("/assigned-to-me")
+    public ResponseEntity<?> getAssignedCoursesToCurrentFaculty() {
+        try {
+            List<CourseResponseDTO> courses = courseService.getCoursesAssignedToCurrentFaculty();
+            return ResponseEntity.ok(courses);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to fetch courses for faculty."));
+        }
+    }
 }
