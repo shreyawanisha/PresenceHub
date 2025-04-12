@@ -2,8 +2,10 @@ package org.attendance.dao;
 
 import jakarta.persistence.NoResultException;
 import org.attendance.entity.Course;
+import org.attendance.entity.Faculty;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,5 +25,13 @@ public class CourseDAOImpl extends GenericDAOImpl<Course> implements CourseDAO {
         } catch (NoResultException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public List<Course> findByFacultiesContaining(Faculty faculty) {
+        return getSession()
+                .createQuery("SELECT c FROM Course c JOIN c.faculties f WHERE f = :faculty", Course.class)
+                .setParameter("faculty", faculty)
+                .getResultList();
     }
 }
