@@ -25,38 +25,41 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT-based = no session needed
                 )
+
                 .authorizeHttpRequests(auth -> auth
-                        // Public JSP routes
+                        // ✅ Public frontend routes
                         .requestMatchers(
                                 "/", "/home", "/login", "/register",
-                                "/student/**", "/admin/**", "/faculty/**",
+//                                "/student/**", "/faculty/**", "/admin/**", // JSP-based routes
                                 "/WEB-INF/views/**",
                                 "/images/**", "/css/**", "/js/**"
                         ).permitAll()
 
-                        // Public API endpoints
-                        .requestMatchers("/api/users/login", "/api/users/register", "/api/users/logout").permitAll()
+                        // ✅ Public API routes
+                        .requestMatchers(
+                                "/api/users/login",
+                                "/api/users/register"
+                        ).permitAll()
 
-                        // Everything else needs auth
-                        .anyRequest().authenticated()
+                        // ✅ Protect backend APIs
+                        .requestMatchers("/api/**").authenticated()
+
+                        // ✅ Fallback
+                        .anyRequest().permitAll()
                 )
 
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
-                        .permitAll()
-                )
+                // ✅ No form-based login
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .formLogin(form -> form.disable())
 
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
-                        .permitAll()
-                )
+                // ✅ No logout redirect (handled via frontend logout logic)
+                .logout(logout -> logout.disable())
 
-                // JWT Filter before username-password filter
+                // ✅ Add your custom JWT filter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -98,6 +99,12 @@ public class StudentServiceImpl implements StudentService {
         Student student = studentDAO.findByUserEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found with email: " + email));
         return mapToDto(student);
+    }
+
+    @Override
+    public Optional<StudentResponseDTO> findByUser(User user) {
+      return studentDAO.findByUserId(user.getId())
+                .map(this::mapToDto);
     }
 
     private StudentResponseDTO mapToDto(Student student) {
