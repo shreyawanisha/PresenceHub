@@ -1,6 +1,7 @@
 package org.attendance.service.interfaces;
 
 import org.attendance.dto.response.AssignCourseToFacultyRequestDTO;
+import org.attendance.dto.response.CourseResponseDTO;
 import org.attendance.entity.Course;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface CourseService {
     boolean existsByCrn(String crn);
     Optional<Course> getById(Long id);
     void assignFacultyToCourse(AssignCourseToFacultyRequestDTO requestDTO);
+    List<CourseResponseDTO> getCoursesAssignedToCurrentFaculty();
 }

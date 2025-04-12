@@ -1,9 +1,14 @@
 package org.attendance.service;
 
 import org.attendance.dao.FacultyDAO;
+import org.attendance.dao.UserDAO;
 import org.attendance.dto.response.AssignCourseToFacultyRequestDTO;
+import org.attendance.dto.response.CourseResponseDTO;
+import org.attendance.dto.response.FacultyResponseDTO;
 import org.attendance.entity.Faculty;
+import org.attendance.entity.User;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.attendance.dao.CourseDAO;
 import org.attendance.entity.Course;
@@ -20,10 +25,12 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseDAO courseDAO;
     private final FacultyDAO facultyDAO;
+    private final UserDAO userDao;
 
-    public CourseServiceImpl(CourseDAO courseDAO, FacultyDAO facultyDAO) {
+    public CourseServiceImpl(CourseDAO courseDAO, FacultyDAO facultyDAO, UserDAO userDao) {
         this.courseDAO = courseDAO;
         this.facultyDAO = facultyDAO;
+        this.userDao = userDao;
     }
 
     @Override
@@ -72,5 +79,36 @@ public class CourseServiceImpl implements CourseService {
 
         course.getFaculties().addAll(newFacultyToAssign);
         courseDAO.update(course);
+    }
+
+    @Override
+    public List<CourseResponseDTO> getCoursesAssignedToCurrentFaculty() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated, Please login");
+        }
+        Faculty faculty = facultyDAO.findByUserId(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Faculty not found with user ID: " + user.getId()));
+        List<Course> assignedCourses = courseDAO.findByFacultiesContaining(faculty);
+        return mapToCourseResponseDTO(assignedCourses);
+    }
+
+    private List<CourseResponseDTO> mapToCourseResponseDTO(List<Course> assignedCourses) {
+        return assignedCourses.stream()
+                .map(course -> new CourseResponseDTO(
+                        course.getId(),
+                        course.getCrn(),
+                        course.getCourseName(),
+                        course.getDepartment(),
+                        course.getSemester(),
+                        course.getFaculties().stream()
+                                .map(faculty -> new FacultyResponseDTO(
+                                        faculty.getUser().getId(),
+                                        faculty.getDepartment(),
+                                        faculty.getUser().getEmail(),
+                                        faculty.getUser().getUsername()))
+                                .collect(Collectors.toList())
+                ))
+                .collect(Collectors.toList());
     }
 }
