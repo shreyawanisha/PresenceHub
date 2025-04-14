@@ -9,6 +9,7 @@ import org.attendance.dto.response.StudentResponseDTO;
 import org.attendance.entity.Course;
 import org.attendance.entity.Enrollment;
 import org.attendance.entity.Student;
+import org.attendance.entity.User;
 import org.attendance.service.interfaces.EnrollmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -46,9 +47,14 @@ public class EnrollmentServiceImpl implements EnrollmentService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Student is already enrolled in this course.");
         }
 
+        long enrolledCount = enrollmentDAO.findByStudentId(studentId).size();
+
+        if (enrolledCount >= 2) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot enroll in more than 2 courses.");
+        }
+
         Enrollment enrollment = new Enrollment(student, course);
         enrollmentDAO.save(enrollment);
-
     }
 
     @Override
@@ -71,6 +77,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         return enrollments.stream()
                 .map(e -> mapToCourseDto(e.getCourse()))
                 .collect(Collectors.toList());
+    }
+
+    public void selfEnrollCurrentStudent(User user, long courseId) {
+        Student student = studentDAO.findByUserId(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not registered"));
+
+        enrollStudentToCourse(student.getId(), courseId);
     }
 
     private StudentResponseDTO mapToStudentDto(Student student) {
