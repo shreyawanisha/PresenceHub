@@ -4,7 +4,6 @@ import org.attendance.dao.UserDAO;
 import org.attendance.dto.response.ApiResponse;
 import org.attendance.dto.request.FacultyRequestDTO;
 import org.attendance.dto.response.FacultyResponseDTO;
-import org.attendance.entity.User;
 import org.attendance.service.interfaces.FacultyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
