@@ -1,6 +1,7 @@
 package org.attendance.controller;
 
 import jakarta.validation.Valid;
+import org.attendance.dto.request.EnrollmentCourseRequestDTO;
 import org.attendance.dto.request.EnrollmentRequestDTO;
 import org.attendance.dto.response.ApiResponse;
 import org.attendance.dto.response.CourseResponseDTO;
@@ -56,6 +57,14 @@ public class EnrollmentController {
     public ResponseEntity<List<CourseResponseDTO>> getCoursesForCurrentStudent() {
         Long studentId = getCurrentStudentId();
         return ResponseEntity.ok(enrollmentService.getCoursesByStudent(studentId));
+    }
+
+    @PostMapping("/self-enroll")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<?> selfEnroll(@RequestBody EnrollmentCourseRequestDTO dto) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        enrollmentService.selfEnrollCurrentStudent(user, dto.getCourseId());
+        return ResponseEntity.ok(new ApiResponse(200, "Enrolled successfully"));
     }
 
     private Long getCurrentStudentId() {
