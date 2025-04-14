@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: shreyawanisha
-  Date: 11/04/25
-  Time: 10:32 pm
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -12,13 +5,11 @@
 <head>
     <title>Admin Dashboard - PresenceHub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
             background: #f8f9fa;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
         }
         .dashboard-header {
             font-size: 2rem;
@@ -31,9 +22,23 @@
             background: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .quick-actions a {
-            text-decoration: none;
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            background-color: #eaf2ff;
+        }
+        .user-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .scrollable-container {
+            max-height: 500px;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -44,74 +49,74 @@
 <div class="container mt-5">
     <h2 class="text-center dashboard-header">🛡️ Admin Dashboard</h2>
 
+    <!-- Stats -->
     <div class="row text-center mb-5">
         <div class="col-md-4">
-            <div class="stat-card">
+            <div class="stat-card" id="viewAllStudents" data-bs-toggle="tooltip" title="Click to view all students">
                 <h4>Total Students</h4>
                 <p class="fs-2" id="studentCount">...</p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card">
+            <div class="stat-card" id="viewAllFaculty" data-bs-toggle="tooltip" title="Click to view all faculty">
                 <h4>Total Faculty</h4>
                 <p class="fs-2" id="facultyCount">...</p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card">
+            <div class="stat-card" id="viewAllCourses" data-bs-toggle="tooltip" title="Click to view all courses">
                 <h4>Total Courses</h4>
                 <p class="fs-2" id="courseCount">...</p>
             </div>
         </div>
     </div>
 
-    <div class="row quick-actions text-center">
-        <div class="col-md-3">
-            <a href="/register" class="btn btn-outline-primary w-100">+ Register Student</a>
+    <!-- Quick Actions -->
+    <div class="row text-center mb-4">
+        <div class="col-md-6"><a href="/add-course" class="btn btn-outline-primary w-100">+ Add New Course</a></div>
+        <div class="col-md-6"><a href="/assign-faculty" class="btn btn-outline-primary w-100">+ Assign Faculty to Course</a></div>
+    </div>
+
+    <!-- Authorization Section -->
+    <div class="accordion mt-5" id="authorizationAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#studentAuthBody">
+                    Authorize Students
+                </button>
+            </h2>
+            <div id="studentAuthBody" class="accordion-collapse collapse show">
+                <div class="accordion-body">
+                    <div id="unassignedStudentsContainer" class="row g-4"></div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-3">
-            <a href="/register" class="btn btn-outline-primary w-100">+ Register Faculty</a>
-        </div>
-        <div class="col-md-3">
-            <a href="/add-course" class="btn btn-outline-primary w-100">+ Add Course</a>
-        </div>
-        <div class="col-md-3">
-            <a href="/assign-faculty" class="btn btn-outline-primary w-100">+ Assign Faculty</a>
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#facultyAuthBody">
+                    Authorize Faculty
+                </button>
+            </h2>
+            <div id="facultyAuthBody" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    <div id="unassignedFacultyContainer" class="row g-4"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<jsp:include page="fragments/footer.jsp"/>
+<!-- Modals -->
+<jsp:include page="fragments/admin_modals.jsp"/>
+<jsp:include page="fragments/admin_lists.jsp"/>
 
+<script src="/js/admin-dashboard.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", async function () {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            window.location.href = "/login";
-            return;
-        }
-
-        try {
-            const [studentsRes, facultyRes, coursesRes] = await Promise.all([
-                fetch("/api/students", { headers: { Authorization: "Bearer " + token } }),
-                fetch("/api/faculties", { headers: { Authorization: "Bearer " + token } }),
-                fetch("/api/courses", { headers: { Authorization: "Bearer " + token } })
-            ]);
-
-            const students = await studentsRes.json();
-            const faculty = await facultyRes.json();
-            const courses = await coursesRes.json();
-
-            document.getElementById("studentCount").textContent = students.length;
-            document.getElementById("facultyCount").textContent = faculty.length;
-            document.getElementById("courseCount").textContent = courses.length;
-
-        } catch (err) {
-            console.error("Error loading dashboard stats:", err);
-        }
+    document.addEventListener("DOMContentLoaded", function () {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
     });
 </script>
-
 </body>
 </html>
-
