@@ -40,7 +40,6 @@ public class StudentServiceImpl implements StudentService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (user.getRole().getName() != RoleType.STUDENT) {
-            System.out.println(user.getRole().getName());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not have STUDENT role");
         }
 
@@ -48,11 +47,15 @@ public class StudentServiceImpl implements StudentService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Student already exists for this user");
         }
 
+        if (user.getRollNumber() == null || user.getDepartment() == null || user.getSemester() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is missing required student details");
+        }
+
         Student student = new Student();
         student.setUser(user);
-        student.setRollNumber(dto.getRollNumber());
-        student.setDepartment(dto.getDepartment());
-        student.setSemester(dto.getSemester());
+        student.setRollNumber(user.getRollNumber());
+        student.setDepartment(user.getDepartment());
+        student.setSemester(user.getSemester());
 
         studentDAO.save(student);
     }

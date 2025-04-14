@@ -28,24 +28,27 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     @Override
-    public User createFaculty(FacultyRequestDTO dto) {
-        User user = (userDAO.findById(dto.getUserId()))
+    public void registerFaculty(FacultyRequestDTO dto) {
+        User user = userDAO.findById(dto.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (user.getRole().getName() != RoleType.FACULTY) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not have FACULTY role");
         }
 
-        if (facultyDAO.findByUserId(dto.getUserId()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Faculty already exists");
+        if (facultyDAO.findByUserId(user.getId()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Faculty already exists for this user");
+        }
+
+        if (user.getDepartment() == null || user.getDepartment().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is missing faculty department info");
         }
 
         Faculty faculty = new Faculty();
         faculty.setUser(user);
-        faculty.setDepartment(dto.getDepartment());
+        faculty.setDepartment(user.getDepartment());
 
         facultyDAO.save(faculty);
-        return user;
     }
 
     @Override

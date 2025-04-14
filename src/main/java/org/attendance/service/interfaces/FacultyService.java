@@ -7,7 +7,7 @@ import org.attendance.entity.User;
 import java.util.List;
 
 public interface FacultyService {
-    User createFaculty(FacultyRequestDTO facultyDTO);
+    void registerFaculty(FacultyRequestDTO facultyDTO);
     List<FacultyResponseDTO> getAllFaculty();
     FacultyResponseDTO getFacultyByUserId(Long id);
 }

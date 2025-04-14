@@ -29,12 +29,9 @@ public class FacultyController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createFaculty(@RequestBody FacultyRequestDTO facultyDTO) {
-        final User user = facultyService.createFaculty(facultyDTO);
-        final String message = String.format(
-                "Faculty created successfully:\n UserId: %d\n User email: %s\n Department: %s",
-                user.getId(), user.getEmail(), facultyDTO.getDepartment()
-        );
-        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), message));
+        facultyService.registerFaculty(facultyDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse(HttpStatus.CREATED.value(), "Faculty created successfully"));
     }
 
     @GetMapping
