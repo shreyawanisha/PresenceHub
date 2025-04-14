@@ -21,6 +21,9 @@
       background-color: #f8f9fa;
       padding: 15px 0;
     }
+    .course-card {
+      height: 100%;
+    }
   </style>
 </head>
 <body>
@@ -28,98 +31,147 @@
 <jsp:include page="fragments/navbar.jsp" />
 
 <div class="container dashboard-container">
-  <!-- Alert shown if user is not assigned -->
   <div id="notAssignedAlert" class="alert alert-warning text-center mt-4" style="display: none;">
     🚫 You are not yet assigned as a student. Please contact the admin.
   </div>
 
-  <!-- Enrolled course list -->
-  <div id="studentCourses" style="display: none;">
-    <h2 class="dashboard-title mb-4">📚 Your Enrolled Courses</h2>
-    <div id="courseList" class="row"></div>
-    <div id="emptyMessage" class="text-muted mt-3" style="display: none;">
-      You are not enrolled in any courses yet.
+  <div id="studentDashboardContent" style="display: none;">
+    <h2 class="mb-4">📚 Your Enrolled Courses</h2>
+    <div id="enrolledCourses" class="row mb-5"></div>
+
+    <div class="mb-3">
+      <h4 class="mb-1">🎓 Available Courses to Enroll</h4>
+      <p class="text-muted">You can enroll in a maximum of <strong>2 courses</strong>.</p>
+      <button class="btn btn-outline-secondary" type="button" id="toggleCourseBtn">
+        🔽 Show Courses
+      </button>
+      <div class="collapse mt-3" id="availableCourses">
+        <div class="row" id="availableCoursesList"></div>
+      </div>
     </div>
   </div>
 </div>
 
 <jsp:include page="fragments/footer.jsp" />
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
   document.addEventListener("DOMContentLoaded", async function () {
     const token = localStorage.getItem("token");
-    if (!token) {
-      window.location.href = "/login";
-      return;
-    }
+    if (!token) return (window.location.href = "/login");
 
-    // Check student assignment
     try {
       const checkResponse = await fetch("/api/students/me", {
-        headers: { "Authorization": "Bearer " + token }
+        headers: { Authorization: "Bearer " + token }
       });
 
       if (!checkResponse.ok) {
-        // Not assigned
         document.getElementById("notAssignedAlert").style.display = "block";
         return;
       }
 
-      // Assigned - Show course section
-      document.getElementById("studentCourses").style.display = "block";
+      document.getElementById("studentDashboardContent").style.display = "block";
 
-      const response = await fetch("/api/enrollments/my-courses", {
-        headers: { "Authorization": "Bearer " + token }
-      });
+      const [enrolledRes, allCoursesRes] = await Promise.all([
+        fetch("/api/enrollments/my-courses", { headers: { Authorization: "Bearer " + token } }),
+        fetch("/api/courses", { headers: { Authorization: "Bearer " + token } })
+      ]);
 
-      if (!response.ok) throw new Error("Failed to fetch courses");
+      const enrolledCourses = await enrolledRes.json();
+      const allCourses = await allCoursesRes.json();
 
-      const courses = await response.json();
-      const container = document.getElementById("courseList");
-      const emptyMessage = document.getElementById("emptyMessage");
+      const enrolledIds = enrolledCourses.map(c => c.id);
+      const enrolledContainer = document.getElementById("enrolledCourses");
+      const availableContainer = document.getElementById("availableCoursesList");
 
-      if (courses.length === 0) {
-        emptyMessage.style.display = "block";
-        return;
+      if (enrolledCourses.length === 0) {
+        enrolledContainer.innerHTML = '<div class="text-muted">You are not enrolled in any courses yet.</div>';
+      } else {
+        enrolledCourses.forEach(course => {
+          enrolledContainer.innerHTML += createCourseCard(course, false);
+        });
       }
 
-      courses.forEach(course => {
-        const div = document.createElement("div");
-        div.className = "col-md-6";
+      const canEnroll = enrolledCourses.length < 2;
+      const availableToShow = allCourses.filter(c => !enrolledIds.includes(c.id));
 
-        let facultyListHTML = "";
-        if (course.faculties && Array.isArray(course.faculties) && course.faculties.length > 0) {
-          facultyListHTML = '<ul class="mb-0">';
-          course.faculties.forEach(faculty => {
-            facultyListHTML += `<li>${faculty.username} (${faculty.email})</li>`;
-          });
-          facultyListHTML += '</ul>';
+      if (availableToShow.length === 0) {
+        availableContainer.innerHTML = '<div class="text-muted">No more courses available for enrollment.</div>';
+      } else {
+        availableToShow.forEach(course => {
+          availableContainer.innerHTML += createCourseCard(course, canEnroll);
+        });
+      }
+
+      // Toggle Button for Collapse
+      const collapseEl = document.getElementById("availableCourses");
+      const toggleBtn = document.getElementById("toggleCourseBtn");
+      const collapseInstance = new bootstrap.Collapse(collapseEl, { toggle: false });
+
+      toggleBtn.addEventListener("click", () => {
+        const isShown = collapseEl.classList.contains("show");
+        if (isShown) {
+          collapseInstance.hide();
+          toggleBtn.innerHTML = "🔽 Show Courses";
         } else {
-          facultyListHTML = `<span class="text-muted">No faculty assigned yet</span>`;
+          collapseInstance.show();
+          toggleBtn.innerHTML = "🔼 Hide Courses";
         }
-
-        div.innerHTML = `
-          <div class="card course-card shadow-sm">
-            <div class="card-body">
-              <h5 class="card-title text-primary">${course.courseName}</h5>
-              <p class="card-text"><strong>CRN:</strong> ${course.crn}</p>
-              <p class="card-text"><strong>Department:</strong> ${course.department}</p>
-              <p class="card-text"><strong>Semester:</strong> ${course.semester}</p>
-              <h6 class="card-subtitle mb-2 text-muted"><strong>Faculty:</strong></h6>
-              ${facultyListHTML}
-            </div>
-          </div>
-        `;
-
-        container.appendChild(div);
       });
+
     } catch (err) {
       console.error("Error loading student dashboard:", err);
       document.getElementById("notAssignedAlert").textContent = "❌ Error loading dashboard. Please try again.";
       document.getElementById("notAssignedAlert").style.display = "block";
     }
   });
-</script>
 
+  function createCourseCard(course, showEnroll) {
+    let html = '<div class="col-md-6 mb-4">' +
+            '<div class="card course-card shadow-sm">' +
+            '<div class="card-body">' +
+            '<h5 class="card-title text-primary">' + course.courseName + '</h5>' +
+            '<p class="card-text"><strong>CRN:</strong> ' + course.crn + '</p>' +
+            '<p class="card-text"><strong>Department:</strong> ' + course.department + '</p>' +
+            '<p class="card-text"><strong>Semester:</strong> ' + course.semester + '</p>' +
+            '<h6 class="card-subtitle mb-2 text-muted">Faculty</h6>' +
+            renderFacultyList(course.faculties);
+
+    if (showEnroll) {
+      html += '<button class="btn btn-sm btn-success mt-3" onclick="enrollInCourse(' + course.id + ')">Enroll</button>';
+    }
+
+    html += '</div></div></div>';
+    return html;
+  }
+
+  function renderFacultyList(faculties) {
+    if (!faculties || faculties.length === 0) {
+      return '<span class="text-muted">No faculty assigned yet</span>';
+    }
+    return '<ul>' + faculties.map(f => '<li>' + f.username + ' (' + f.email + ')</li>').join('') + '</ul>';
+  }
+
+  async function enrollInCourse(courseId) {
+    const token = localStorage.getItem("token");
+    const res = await fetch("/api/enrollments/self-enroll", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ courseId })
+    });
+
+    const msg = await res.json();
+    if (res.ok) {
+      alert("🎉 Enrolled successfully!");
+      location.reload();
+    } else {
+      alert("❌ " + msg.message);
+    }
+  }
+</script>
 </body>
 </html>
