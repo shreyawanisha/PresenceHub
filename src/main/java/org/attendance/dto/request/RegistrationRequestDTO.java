@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.attendance.enums.RoleType;
+import org.attendance.enums.Semester;
 import org.attendance.validation.NortheasternEmail;
 
 public class RegistrationRequestDTO {
@@ -22,6 +23,35 @@ public class RegistrationRequestDTO {
 
     @NotNull(message = "Role is required")
     private RoleType role;
+
+    private String rollNumber;
+
+    public String getRollNumber() {
+        return rollNumber;
+    }
+
+    public void setRollNumber(String rollNumber) {
+        this.rollNumber = rollNumber;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public Semester getSemester() {
+        return semester;
+    }
+
+    public void setSemester(Semester semester) {
+        this.semester = semester;
+    }
+
+    private String department;
+    private Semester semester;
 
     public RegistrationRequestDTO() {
     }
