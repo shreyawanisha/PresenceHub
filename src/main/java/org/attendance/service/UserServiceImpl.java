@@ -1,5 +1,7 @@
 package org.attendance.service;
 
+import org.attendance.dao.FacultyDAO;
+import org.attendance.dao.StudentDAO;
 import org.springframework.transaction.annotation.Transactional;
 import org.attendance.dao.RoleDAO;
 import org.attendance.dao.UserDAO;
@@ -11,24 +13,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    private final UserDAO userDao;
-    private final RoleDAO roleDao;
+    private final UserDAO userDAO;
+    private final RoleDAO roleDAO;
+    private final StudentDAO studentDAO;
+    private final FacultyDAO facultyDAO;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserDAO userDao, RoleDAO roleDao, BCryptPasswordEncoder passwordEncoder) {
-        this.userDao = userDao;
-        this.roleDao = roleDao;
+    public UserServiceImpl(UserDAO userDAO, RoleDAO roleDAO, StudentDAO studentDAO, FacultyDAO facultyDAO, BCryptPasswordEncoder passwordEncoder) {
+        this.userDAO = userDAO;
+        this.roleDAO = roleDAO;
+        this.studentDAO = studentDAO;
+        this.facultyDAO = facultyDAO;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void registerUser(RegistrationRequestDTO userDTO) {
-        Role role = roleDao.findByName(userDTO.getRole())
+        Role role = roleDAO.findByName(userDTO.getRole())
                 .orElseThrow(() -> new RuntimeException("Invalid role: " + userDTO.getRole()));
 
         User user = new User();
@@ -37,12 +45,16 @@ public class UserServiceImpl implements UserService {
         user.setPassword(userDTO.getPassword());
         user.setRole(role);
 
-        userDao.save(user);
+        user.setRollNumber(userDTO.getRollNumber());
+        user.setDepartment(userDTO.getDepartment());
+        user.setSemester(userDTO.getSemester());
+
+        userDAO.save(user);
     }
 
     @Override
     public void login(String email, String password) {
-        User user = userDao.findByEmail(email)
+        User user = userDAO.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found, please check your email or password"));
 
         validatePassword(user, password);
@@ -56,12 +68,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean existsByEmail(String email) {
-        return userDao.findByEmail(email).isPresent();
+        return userDAO.findByEmail(email).isPresent();
     }
 
     @Override
     public User getByEmail(String email) {
-        return userDao.findByEmail(email)
+        return userDAO.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("This user doesn't exist, please register first"));
+    }
+
+    @Override
+    public List<User> getUnassignedStudentUsers() {
+        return userDAO.findAll().stream()
+                .filter(user -> user.getRole().getName().name().equals("STUDENT"))
+                .filter(user -> studentDAO.findByUserId(user.getId()).isEmpty())
+                .toList();
+    }
+
+    @Override
+    public List<User> getUnassignedFacultyUsers() {
+        return userDAO.findAll().stream()
+                .filter(user -> user.getRole().getName().name().equals("FACULTY"))
+                .filter(user -> facultyDAO.findByUserId(user.getId()).isEmpty())
+                .toList();
     }
 }
