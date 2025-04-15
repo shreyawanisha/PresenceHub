@@ -3,6 +3,7 @@ package org.attendance.dao;
 import org.attendance.entity.Student;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -30,5 +31,12 @@ public class StudentDAOImpl extends GenericDAOImpl<Student> implements StudentDA
         return getSession().createQuery("FROM Student s WHERE s.user.email = :email", Student.class)
                 .setParameter("email", email)
                 .uniqueResultOptional();
+    }
+
+    @Override
+    public List<Student> findStudentsByCourse(Long courseId) {
+        return getSession().createQuery("SELECT e.student FROM Enrollment e WHERE e.course.id = :courseId", Student.class)
+                .setParameter("courseId", courseId)
+                .getResultList();
     }
 }

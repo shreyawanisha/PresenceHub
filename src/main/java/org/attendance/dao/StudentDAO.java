@@ -1,6 +1,8 @@
 package org.attendance.dao;
 
 import org.attendance.entity.Student;
+
+import java.util.List;
 import java.util.Optional;
 
 public interface StudentDAO extends GenericDAO<Student>{
@@ -8,4 +10,6 @@ public interface StudentDAO extends GenericDAO<Student>{
     Optional<Student> findByRollNumber(String rollNumber);
 
     Optional<Student> findByUserEmail(String email);
+
+    List<Student> findStudentsByCourse(Long courseId);
 }
