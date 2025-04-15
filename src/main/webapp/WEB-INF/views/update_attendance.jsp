@@ -120,8 +120,8 @@
             li.innerHTML = `
                 <span><strong>${rec.username}</strong> (${rec.rollNumber})</span>
                 <div>
-                    <button class="btn btn-sm ${rec.status === 'PRESENT' ? 'btn-success' : 'btn-outline-success'} me-2 toggle-btn" data-id="${rec.attendanceId}" data-status="PRESENT">Present</button>
-                    <button class="btn btn-sm ${rec.status === 'ABSENT' ? 'btn-danger' : 'btn-outline-danger'} toggle-btn" data-id="${rec.attendanceId}" data-status="ABSENT">Absent</button>
+                    <button class="btn btn-sm ${rec.status == 'PRESENT' ? 'btn-success' : 'btn-outline-success'} me-2 toggle-btn" data-id="${rec.attendanceId}" data-status="PRESENT">Present</button>
+                    <button class="btn btn-sm ${rec.status == 'ABSENT' ? 'btn-danger' : 'btn-outline-danger'} toggle-btn" data-id="${rec.attendanceId}" data-status="ABSENT">Absent</button>
                 </div>
             `;
             list.appendChild(li);
