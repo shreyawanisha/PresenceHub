@@ -55,24 +55,28 @@ public class CourseServiceImpl implements CourseService {
     public void assignFacultyToCourse(AssignCourseToFacultyRequestDTO requestDTO) {
         Course course = courseDAO.findById(requestDTO.getCourseId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found with ID: " + requestDTO.getCourseId()));
-        final Set<Long> alreadyAssignedFacultyIds = course.getFaculties().stream().map(faculty -> faculty.getUser().getId()).collect(Collectors.toSet());
 
-        List<Long> alreadyAssigned = new ArrayList<>();
+        Set<Long> existingFacultyIds = course.getFaculties().stream()
+                .map(Faculty::getId)
+                .collect(Collectors.toSet());
+
+        List<String> alreadyAssignedNames = new ArrayList<>();
         Set<Faculty> newFacultyToAssign = new HashSet<>();
 
         for (Long facultyId : requestDTO.getFacultyIds()) {
-            Faculty faculty = facultyDAO.findByUserId(facultyId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Faculty not found with user ID: " + facultyId));
+            Faculty faculty = facultyDAO.findById(facultyId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Faculty not found with ID: " + facultyId));
 
-            if (alreadyAssignedFacultyIds.contains(facultyId)) {
-                alreadyAssigned.add(facultyId);
+            if (existingFacultyIds.contains(facultyId)) {
+                alreadyAssignedNames.add(faculty.getUser().getUsername());
             } else {
                 newFacultyToAssign.add(faculty);
             }
         }
 
-        if (!alreadyAssigned.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Course already has faculties with user IDs: " + alreadyAssigned);
+        if (!alreadyAssignedNames.isEmpty()) {
+            String msg = "Course already has these assigned faculties: " + String.join(", ", alreadyAssignedNames);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, msg);
         }
 
         course.getFaculties().addAll(newFacultyToAssign);
