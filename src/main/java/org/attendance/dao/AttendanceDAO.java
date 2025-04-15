@@ -15,4 +15,6 @@ public interface AttendanceDAO extends GenericDAO<Attendance> {
     boolean existsByCourseAndDate(Long courseId, LocalDate date);
 
     List<Attendance> findByCourseAndDate(Long courseId, LocalDate date);
+
+    List<Attendance> findByStudentId(long studentId);
 }
