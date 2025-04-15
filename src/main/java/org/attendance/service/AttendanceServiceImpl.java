@@ -2,21 +2,24 @@ package org.attendance.service;
 
 import org.attendance.dao.AttendanceDAO;
 import org.attendance.dao.CourseDAO;
+import org.attendance.dao.EnrollmentDAO;
 import org.attendance.dao.StudentDAO;
 import org.attendance.dto.response.AttendanceRecordDTO;
 import org.attendance.dto.request.AttendanceBatchRequestDTO;
-import org.attendance.entity.Attendance;
-import org.attendance.entity.Course;
-import org.attendance.entity.Student;
+import org.attendance.dto.response.AttendanceSummaryDTO;
+import org.attendance.entity.*;
 import org.attendance.enums.AttendanceStatus;
 import org.attendance.service.interfaces.AttendanceService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,11 +30,13 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final AttendanceDAO attendanceDAO;
     private final StudentDAO studentDAO;
     private final CourseDAO courseDAO;
+    private final EnrollmentDAO enrollmentDAO;
 
-    public AttendanceServiceImpl(AttendanceDAO attendanceDAO, StudentDAO studentDAO, CourseDAO courseDAO) {
+    public AttendanceServiceImpl(AttendanceDAO attendanceDAO, StudentDAO studentDAO, CourseDAO courseDAO, EnrollmentDAO enrollmentDAO) {
         this.attendanceDAO = attendanceDAO;
         this.studentDAO = studentDAO;
         this.courseDAO = courseDAO;
+        this.enrollmentDAO = enrollmentDAO;
     }
 
     @Override
@@ -85,4 +90,46 @@ public class AttendanceServiceImpl implements AttendanceService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public List<AttendanceSummaryDTO> getAttendanceSummaryForCurrentStudent() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Student student = studentDAO.findByUserId(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found, please contact admin."));
+
+        List<Enrollment> enrollments = enrollmentDAO.findByStudentId(student.getId());
+        List<Long> courseIds = enrollments.stream().map(e -> e.getCourse().getId()).toList();
+
+        List<Attendance> allAttendance = attendanceDAO.findByStudentId(student.getId());
+
+        Map<Long, List<Attendance>> grouped = allAttendance.stream()
+                .filter(a -> courseIds.contains(a.getCourse().getId()))
+                .collect(Collectors.groupingBy(a -> a.getCourse().getId()));
+
+        List<AttendanceSummaryDTO> summaryList = new ArrayList<>();
+
+        for (Enrollment enrollment : enrollments) {
+            Course course = enrollment.getCourse();
+            List<Attendance> courseAttendance = grouped.getOrDefault(course.getId(), new ArrayList<>());
+            int total = courseAttendance.size();
+            int present = (int) courseAttendance.stream()
+                    .filter(a -> a.getStatus() == AttendanceStatus.PRESENT)
+                    .count();
+            double percentage = total == 0 ? 0 : (present * 100.0 / total);
+
+            AttendanceSummaryDTO dto = new AttendanceSummaryDTO();
+            dto.setCourseName(course.getCourseName());
+            dto.setCrn(course.getCrn());
+            dto.setDepartment(course.getDepartment());
+            dto.setSemester(course.getSemester().name());
+            dto.setTotalClasses(total);
+            dto.setPresentCount(present);
+            dto.setPercentage(Math.round(percentage * 100.0) / 100.0);
+
+            summaryList.add(dto);
+        }
+
+        return summaryList;
+    }
+
 }
