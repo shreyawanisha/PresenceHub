@@ -73,13 +73,18 @@
 
       document.getElementById("studentDashboardContent").style.display = "block";
 
-      const [enrolledRes, allCoursesRes] = await Promise.all([
+      const [enrolledRes, allCoursesRes, summaryRes] = await Promise.all([
         fetch("/api/enrollments/my-courses", { headers: { Authorization: "Bearer " + token } }),
-        fetch("/api/courses", { headers: { Authorization: "Bearer " + token } })
+        fetch("/api/courses", { headers: { Authorization: "Bearer " + token } }),
+        fetch("/api/attendance/summary/my-courses", { headers: { Authorization: "Bearer " + token } })
       ]);
 
       const enrolledCourses = await enrolledRes.json();
       const allCourses = await allCoursesRes.json();
+      const summaries = await summaryRes.json();
+
+      const summaryMap = {};
+      summaries.forEach(s => summaryMap[s.crn] = s);
 
       const enrolledIds = enrolledCourses.map(c => c.id);
       const enrolledContainer = document.getElementById("enrolledCourses");
@@ -89,7 +94,7 @@
         enrolledContainer.innerHTML = '<div class="text-muted">You are not enrolled in any courses yet.</div>';
       } else {
         enrolledCourses.forEach(course => {
-          enrolledContainer.innerHTML += createCourseCard(course, false);
+          enrolledContainer.innerHTML += createCourseCardWithSummary(course, summaryMap[course.crn], false);
         });
       }
 
@@ -100,11 +105,10 @@
         availableContainer.innerHTML = '<div class="text-muted">No more courses available for enrollment.</div>';
       } else {
         availableToShow.forEach(course => {
-          availableContainer.innerHTML += createCourseCard(course, canEnroll);
+          availableContainer.innerHTML += createCourseCardWithSummary(course, null, canEnroll);
         });
       }
 
-      // Toggle Button for Collapse
       const collapseEl = document.getElementById("availableCourses");
       const toggleBtn = document.getElementById("toggleCourseBtn");
       const collapseInstance = new bootstrap.Collapse(collapseEl, { toggle: false });
@@ -127,7 +131,7 @@
     }
   });
 
-  function createCourseCard(course, showEnroll) {
+  function createCourseCardWithSummary(course, summary, showEnroll) {
     let html = '<div class="col-md-6 mb-4">' +
             '<div class="card course-card shadow-sm">' +
             '<div class="card-body">' +
@@ -137,6 +141,15 @@
             '<p class="card-text"><strong>Semester:</strong> ' + course.semester + '</p>' +
             '<h6 class="card-subtitle mb-2 text-muted">Faculty</h6>' +
             renderFacultyList(course.faculties);
+
+    if (summary) {
+      html += `<p class="card-text">
+                  <strong>Attendance:</strong> ${summary.presentCount} / ${summary.totalClasses}
+                  (${summary.percentage}% present)
+               </p>`;
+    }
+
+    html += `<a href="/student/attendance/view?courseId=${course.id}" class="btn btn-sm btn-outline-primary">📅 View Records</a>`;
 
     if (showEnroll) {
       html += '<button class="btn btn-sm btn-success mt-3" onclick="enrollInCourse(' + course.id + ')">Enroll</button>';
