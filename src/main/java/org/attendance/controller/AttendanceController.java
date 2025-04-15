@@ -3,6 +3,7 @@ package org.attendance.controller;
 import org.attendance.dto.response.AttendanceRecordDTO;
 import org.attendance.dto.request.AttendanceBatchRequestDTO;
 import org.attendance.dto.response.ApiResponse;
+import org.attendance.dto.response.AttendanceSummaryDTO;
 import org.attendance.enums.AttendanceStatus;
 import org.attendance.service.interfaces.AttendanceService;
 import org.springframework.http.HttpStatus;
@@ -53,5 +54,11 @@ public class AttendanceController {
     ) {
         List<AttendanceRecordDTO> records = attendanceService.getAttendanceRecords(courseId, date);
         return ResponseEntity.ok(records);
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/summary/my-courses")
+    public ResponseEntity<List<AttendanceSummaryDTO>> getMyAttendanceSummary() {
+        return ResponseEntity.ok(attendanceService.getAttendanceSummaryForCurrentStudent());
     }
 }
