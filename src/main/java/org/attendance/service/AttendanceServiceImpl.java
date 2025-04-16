@@ -147,7 +147,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public List<AttendanceRecordDTO> getReportForCourse(Long courseId, LocalDate startDate, LocalDate endDate) {
+    public List<AttendanceRecordDTO> getAttendanceReport(Long courseId, LocalDate startDate, LocalDate endDate) {
         Course course = courseDAO.findById(courseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found"));
 

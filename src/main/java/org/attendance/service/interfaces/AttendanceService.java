@@ -19,5 +19,5 @@ public interface AttendanceService {
     List<AttendanceSummaryDTO> getAttendanceSummaryForCurrentStudent();
     List<AttendanceRecordDTO> getStudentRecordsByCourse(Long courseId);
 
-    List<AttendanceRecordDTO> getReportForCourse(Long courseId, LocalDate start, LocalDate end);
+    List<AttendanceRecordDTO> getAttendanceReport(Long courseId, LocalDate start, LocalDate end);
 }

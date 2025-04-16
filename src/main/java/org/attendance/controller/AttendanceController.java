@@ -10,8 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -76,9 +78,14 @@ public class AttendanceController {
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate
     ) {
-        LocalDate start = (startDate != null) ? LocalDate.parse(startDate) : null;
-        LocalDate end = (endDate != null) ? LocalDate.parse(endDate) : null;
-        List<AttendanceRecordDTO> report = attendanceService.getReportForCourse(courseId, start, end);
-        return ResponseEntity.ok(report);
+        try {
+            LocalDate start = (startDate != null) ? LocalDate.parse(startDate) : null;
+            LocalDate end = (endDate != null) ? LocalDate.parse(endDate) : null;
+
+            List<AttendanceRecordDTO> report = attendanceService.getAttendanceReport(courseId, start, end);
+            return ResponseEntity.ok(report);
+        } catch (DateTimeParseException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Use YYYY-MM-DD.");
+        }
     }
 }
