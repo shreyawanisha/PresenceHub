@@ -61,4 +61,11 @@ public class AttendanceController {
     public ResponseEntity<List<AttendanceSummaryDTO>> getMyAttendanceSummary() {
         return ResponseEntity.ok(attendanceService.getAttendanceSummaryForCurrentStudent());
     }
+
+    @GetMapping("/my-records")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<List<AttendanceRecordDTO>> getMyAttendanceByCourse(@RequestParam Long courseId) {
+        List<AttendanceRecordDTO> records = attendanceService.getStudentRecordsByCourse(courseId);
+        return ResponseEntity.ok(records);
+    }
 }
