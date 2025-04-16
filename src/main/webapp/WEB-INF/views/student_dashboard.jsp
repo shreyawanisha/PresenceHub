@@ -144,12 +144,13 @@
 
     if (summary) {
       html += `<p class="card-text">
-                  <strong>Attendance:</strong> ${summary.presentCount} / ${summary.totalClasses}
-                  (${summary.percentage}% present)
-               </p>`;
+              <strong>Attendance:</strong> ${summary.presentCount} / ${summary.totalClasses}
+              (${summary.percentage}% present)
+           </p>
+           <div class="d-flex gap-2 mt-3">
+              <a href="/student/attendance/view?courseId=${course.id}" class="btn btn-sm btn-outline-primary">📊 View Records</a>
+           </div>`;
     }
-
-    html += `<a href="/student/attendance/view?courseId=${course.id}" class="btn btn-sm btn-outline-primary">📅 View Records</a>`;
 
     if (showEnroll) {
       html += '<button class="btn btn-sm btn-success mt-3" onclick="enrollInCourse(' + course.id + ')">Enroll</button>';
