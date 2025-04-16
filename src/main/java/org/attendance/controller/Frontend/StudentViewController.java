@@ -10,4 +10,9 @@ public class StudentViewController {
     public String studentDashboard() {
         return "student_dashboard";
     }
+
+    @GetMapping("/student/attendance/view")
+    public String studentAttendanceView() {
+        return "student_attendance";
+    }
 }
