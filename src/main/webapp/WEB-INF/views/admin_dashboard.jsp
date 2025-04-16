@@ -7,16 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
     <style>
-        html, body {
+        body {
             font-family: 'Segoe UI', sans-serif;
             background: #f8f9fa;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        main {
-            padding-top: 30px;
-            padding-bottom: 60px;
         }
         .dashboard-header {
             font-size: 2rem;
@@ -50,8 +43,10 @@
     </style>
 </head>
 <body>
-<jsp:include page="fragments/navbar.jsp" />
-<main class="container">
+
+<jsp:include page="fragments/navbar.jsp"/>
+
+<div class="container mt-5">
     <h2 class="text-center dashboard-header">🛡️ Admin Dashboard</h2>
 
     <!-- Stats -->
@@ -78,44 +73,44 @@
 
     <!-- Quick Actions -->
     <div class="row text-center mb-4">
-        <div class="col-md-6">
-            <a href="/admin/add-course" class="btn btn-outline-primary w-100">➕ Add Course</a>
-        </div>
-        <div class="col-md-6">
-            <a href="/admin/assign-faculty" class="btn btn-outline-success w-100">👩‍🏫 Assign Faculty to courses</a>
-        </div>
+        <div class="col-md-4 mb-2"><a href="/admin/add-course" class="btn btn-outline-primary w-100">➕ Add Course</a></div>
+        <div class="col-md-4 mb-2"><a href="/admin/assign-faculty" class="btn btn-outline-success w-100">👩‍🏫 Assign Faculty</a></div>
+        <div class="col-md-4 mb-2"><a href="/reports/attendance" class="btn btn-outline-dark w-100">📄 View Attendance Report</a></div>
     </div>
 
     <!-- Authorization Section -->
     <div class="accordion mt-5" id="authorizationAccordion">
         <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#studentAuthBody" aria-expanded="true" aria-controls="studentAuthBody">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#studentAuthBody">
                     Authorize Students
                 </button>
             </h2>
-            <div id="studentAuthBody" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#authorizationAccordion">
+            <div id="studentAuthBody" class="accordion-collapse collapse show">
                 <div class="accordion-body">
                     <div id="unassignedStudentsContainer" class="row g-4"></div>
                 </div>
             </div>
         </div>
         <div class="accordion-item">
-            <h2 class="accordion-header" id="headingTwo">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#facultyAuthBody" aria-expanded="false" aria-controls="facultyAuthBody">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#facultyAuthBody">
                     Authorize Faculty
                 </button>
             </h2>
-            <div id="facultyAuthBody" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#authorizationAccordion">
+            <div id="facultyAuthBody" class="accordion-collapse collapse">
                 <div class="accordion-body">
                     <div id="unassignedFacultyContainer" class="row g-4"></div>
                 </div>
             </div>
         </div>
     </div>
-</main>
-<jsp:include page="fragments/admin_modals.jsp" />
-<jsp:include page="fragments/admin_lists.jsp" />
+</div>
+
+<!-- Modals -->
+<jsp:include page="fragments/admin_modals.jsp"/>
+<jsp:include page="fragments/admin_lists.jsp"/>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/admin-dashboard.js"></script>
 <script>

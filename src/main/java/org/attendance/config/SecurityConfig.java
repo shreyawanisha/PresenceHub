@@ -31,7 +31,7 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Public frontend routes
+                        // Public frontend routes
                         .requestMatchers(
                                 "/", "/home", "/login", "/register",
 //                                "/student/**", "/faculty/**", "/admin/**", // JSP-based routes
@@ -39,27 +39,29 @@ public class SecurityConfig {
                                 "/images/**", "/css/**", "/js/**"
                         ).permitAll()
 
-                        // ✅ Public API routes
+                        .requestMatchers("/reports/**").permitAll()
+
+                        // Public API routes
                         .requestMatchers(
                                 "/api/users/login",
                                 "/api/users/register"
                         ).permitAll()
 
-                        // ✅ Protect backend APIs
+                        //  Protect backend APIs
                         .requestMatchers("/api/**").authenticated()
 
-                        // ✅ Fallback
+                        //  Fallback
                         .anyRequest().permitAll()
                 )
 
-                // ✅ No form-based login
+                //  No form-based login
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .formLogin(form -> form.disable())
 
-                // ✅ No logout redirect (handled via frontend logout logic)
+                //  No logout redirect (handled via frontend logout logic)
                 .logout(logout -> logout.disable())
 
-                // ✅ Add your custom JWT filter
+                // Add your custom JWT filter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

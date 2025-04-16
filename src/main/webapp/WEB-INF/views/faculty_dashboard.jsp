@@ -57,6 +57,7 @@
                         <div class="card-actions">
                             <a href="/faculty/attendance?courseId=${course.id}" class="btn btn-sm btn-outline-primary">📅 Mark Attendance</a>
                             <a href="/faculty/attendance/update?courseId=${course.id}" class="btn btn-sm btn-outline-secondary">✏️ Update Attendance</a>
+                            <a href="/reports/attendance?courseId=${course.id}" class="btn btn-sm btn-outline-dark">📄 View Report</a>
                         </div>
                     </div>
                 </div>
