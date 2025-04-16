@@ -58,4 +58,12 @@ public class AttendanceDAOImpl extends GenericDAOImpl<Attendance> implements Att
                 .setParameter("studentId", studentId)
                 .getResultList();
     }
+
+    @Override
+    public List<Attendance> findByStudentAndCourse(Long studentId, Long courseId) {
+        return getSession().createQuery("FROM Attendance a WHERE a.student.id = :studentId AND a.course.id = :courseId ORDER BY a.attendanceDate", Attendance.class)
+                .setParameter("studentId", studentId)
+                .setParameter("courseId", courseId)
+                .getResultList();
+    }
 }
