@@ -132,4 +132,18 @@ public class AttendanceServiceImpl implements AttendanceService {
         return summaryList;
     }
 
+    @Override
+    public List<AttendanceRecordDTO> getStudentRecordsByCourse(Long courseId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Student student = studentDAO.findByUserId(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not registered"));
+
+        List<Attendance> records = attendanceDAO.findByStudentAndCourse(student.getId(), courseId);
+
+        return records.stream()
+                .map(AttendanceRecordDTO::new)
+                .toList();
+    }
+
 }
