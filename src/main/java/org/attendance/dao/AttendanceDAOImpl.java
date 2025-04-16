@@ -66,4 +66,20 @@ public class AttendanceDAOImpl extends GenericDAOImpl<Attendance> implements Att
                 .setParameter("courseId", courseId)
                 .getResultList();
     }
+
+    @Override
+    public List<Attendance> findByCourseAndDateRange(Long courseId, LocalDate startDate, LocalDate endDate) {
+      return getSession().createQuery("FROM Attendance a WHERE a.course.id = :courseId AND a.attendanceDate BETWEEN :startDate AND :endDate", Attendance.class)
+                .setParameter("courseId", courseId)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+    }
+
+    @Override
+    public List<Attendance> findByCourse(Long courseId) {
+       return getSession().createQuery("FROM Attendance a WHERE a.course.id = :courseId", Attendance.class)
+                .setParameter("courseId", courseId)
+                .getResultList();
+    }
 }

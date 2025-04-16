@@ -146,4 +146,35 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .toList();
     }
 
+    @Override
+    public List<AttendanceRecordDTO> getReportForCourse(Long courseId, LocalDate startDate, LocalDate endDate) {
+        Course course = courseDAO.findById(courseId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found"));
+
+        List<Attendance> attendanceList;
+
+        if (startDate != null && endDate != null) {
+            attendanceList = attendanceDAO.findByCourseAndDateRange(courseId, startDate, endDate);
+        } else {
+            attendanceList = attendanceDAO.findByCourse(courseId);
+        }
+
+        return attendanceList.stream().map(att -> {
+            AttendanceRecordDTO dto = new AttendanceRecordDTO();
+            dto.setAttendanceId(att.getId());
+            dto.setDate(att.getAttendanceDate());
+            dto.setStatus(att.getStatus());
+            dto.setCourseName(course.getCourseName());
+
+            Student student = att.getStudent();
+            if (student != null) {
+                dto.setUsername(student.getUser().getUsername());
+                dto.setEmail(student.getUser().getEmail());
+                dto.setRollNumber(student.getRollNumber());
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 }

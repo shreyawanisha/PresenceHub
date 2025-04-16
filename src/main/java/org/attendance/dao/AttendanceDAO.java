@@ -11,11 +11,10 @@ import java.util.Optional;
 public interface AttendanceDAO extends GenericDAO<Attendance> {
     boolean existsByStudentAndCourseAndAttendanceDate(Student student, Course course, LocalDate date);
     Optional<Attendance> findByStudentAndCourseAndDate(Long studentId, Long courseId, LocalDate date);
-
     boolean existsByCourseAndDate(Long courseId, LocalDate date);
-
     List<Attendance> findByCourseAndDate(Long courseId, LocalDate date);
-
     List<Attendance> findByStudentId(long studentId);
     List<Attendance> findByStudentAndCourse(Long studentId, Long courseId);
+    List<Attendance> findByCourseAndDateRange(Long courseId, LocalDate startDate, LocalDate endDate);
+    List<Attendance> findByCourse(Long courseId);
 }

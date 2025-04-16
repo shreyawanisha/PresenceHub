@@ -68,4 +68,17 @@ public class AttendanceController {
         List<AttendanceRecordDTO> records = attendanceService.getStudentRecordsByCourse(courseId);
         return ResponseEntity.ok(records);
     }
+
+    @GetMapping("/report/course/{courseId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FACULTY')")
+    public ResponseEntity<List<AttendanceRecordDTO>> getAttendanceReportByCourse(
+            @PathVariable Long courseId,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
+        LocalDate start = (startDate != null) ? LocalDate.parse(startDate) : null;
+        LocalDate end = (endDate != null) ? LocalDate.parse(endDate) : null;
+        List<AttendanceRecordDTO> report = attendanceService.getReportForCourse(courseId, start, end);
+        return ResponseEntity.ok(report);
+    }
 }
