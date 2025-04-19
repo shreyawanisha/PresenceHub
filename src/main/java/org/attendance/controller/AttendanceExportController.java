@@ -29,9 +29,11 @@ public class AttendanceExportController {
             @PathVariable Long courseId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String search,
             HttpServletResponse response
     ) throws IOException {
-        List<AttendanceRecordDTO> records = attendanceService.getAttendanceReport(courseId, startDate, endDate);
+        List<AttendanceRecordDTO> records = attendanceService.getAttendanceReport(courseId, startDate, endDate, status, search);
 
         if (records.isEmpty()) {
             response.sendError(HttpStatus.NOT_FOUND.value(), "No attendance records found to export.");

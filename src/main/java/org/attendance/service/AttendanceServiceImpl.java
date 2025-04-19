@@ -147,34 +147,27 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public List<AttendanceRecordDTO> getAttendanceReport(Long courseId, LocalDate startDate, LocalDate endDate) {
+    public List<AttendanceRecordDTO> getAttendanceReport(Long courseId, LocalDate start, LocalDate end, String status, String search) {
         Course course = courseDAO.findById(courseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found"));
 
-        List<Attendance> attendanceList;
+        List<Attendance> records = (start != null && end != null)
+                ? attendanceDAO.findByCourseAndDateRange(courseId, start, end)
+                : attendanceDAO.findByCourse(courseId);
 
-        if (startDate != null && endDate != null) {
-            attendanceList = attendanceDAO.findByCourseAndDateRange(courseId, startDate, endDate);
-        } else {
-            attendanceList = attendanceDAO.findByCourse(courseId);
-        }
-
-        return attendanceList.stream().map(att -> {
-            AttendanceRecordDTO dto = new AttendanceRecordDTO();
-            dto.setAttendanceId(att.getId());
-            dto.setDate(att.getAttendanceDate());
-            dto.setStatus(att.getStatus());
-            dto.setCourseName(course.getCourseName());
-
-            Student student = att.getStudent();
-            if (student != null) {
-                dto.setUsername(student.getUser().getUsername());
-                dto.setEmail(student.getUser().getEmail());
-                dto.setRollNumber(student.getRollNumber());
-            }
-
-            return dto;
-        }).collect(Collectors.toList());
+        return records.stream()
+                .filter(r -> {
+                    boolean statusMatch = (status == null || r.getStatus().name().equalsIgnoreCase(status));
+                    boolean searchMatch = (search == null || search.isBlank() ||
+                            r.getStudent() != null && (
+                                    r.getStudent().getRollNumber().toLowerCase().contains(search.toLowerCase()) ||
+                                            r.getStudent().getUser().getUsername().toLowerCase().contains(search.toLowerCase()) ||
+                                            r.getStudent().getUser().getEmail().toLowerCase().contains(search.toLowerCase())
+                            ));
+                    return statusMatch && searchMatch;
+                })
+                .map(AttendanceRecordDTO::new)
+                .toList();
     }
 
 }

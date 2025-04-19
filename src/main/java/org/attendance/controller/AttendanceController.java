@@ -76,13 +76,15 @@ public class AttendanceController {
     public ResponseEntity<List<AttendanceRecordDTO>> getAttendanceReportByCourse(
             @PathVariable Long courseId,
             @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String search
     ) {
         try {
             LocalDate start = (startDate != null) ? LocalDate.parse(startDate) : null;
             LocalDate end = (endDate != null) ? LocalDate.parse(endDate) : null;
 
-            List<AttendanceRecordDTO> report = attendanceService.getAttendanceReport(courseId, start, end);
+            List<AttendanceRecordDTO> report = attendanceService.getAttendanceReport(courseId, start, end, status, search);
             return ResponseEntity.ok(report);
         } catch (DateTimeParseException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Use YYYY-MM-DD.");
