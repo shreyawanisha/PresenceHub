@@ -30,6 +30,7 @@
     </style>
 </head>
 <body>
+
 <jsp:include page="fragments/navbar.jsp" />
 
 <div class="container dashboard-container">
@@ -50,8 +51,11 @@
             <label class="form-label">End Date</label>
             <input type="date" class="form-control" id="endDate">
         </div>
-        <div class="col-md-2 d-flex align-items-end">
-            <button class="btn btn-primary w-100" id="loadReportBtn">📊 Load Report</button>
+        <div class="col-md-1 d-flex align-items-end">
+            <button class="btn btn-primary w-100" id="loadReportBtn">📊 Load</button>
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+            <button class="btn btn-outline-danger w-100" id="exportPdfBtn">📄PDF</button>
         </div>
     </div>
 
@@ -89,6 +93,7 @@
         const res = await fetch(courseEndpoint, {
             headers: { Authorization: "Bearer " + token }
         });
+
         const courses = await res.json();
         courses.forEach(course => {
             const opt = document.createElement("option");
@@ -133,6 +138,51 @@
         `;
                 tbody.appendChild(tr);
             });
+        });
+
+        document.getElementById("exportPdfBtn").addEventListener("click", async function () {
+            const token = localStorage.getItem("token");
+            const courseId = document.getElementById("courseSelect").value;
+            const start = document.getElementById("startDate").value;
+            const end = document.getElementById("endDate").value;
+
+            if (!courseId) {
+                alert("❗ Please select a course to export.");
+                return;
+            }
+
+            const query = new URLSearchParams();
+            if (start) query.append("startDate", start);
+            if (end) query.append("endDate", end);
+
+            const url = `/api/export/pdf/course/${courseId}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        Authorization: "Bearer " + token
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    alert("❌ " + (error.message || "Failed to export PDF."));
+                    return;
+                }
+
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = blobUrl;
+                a.download = `attendance_report_${courseId}.pdf`;
+                a.click();
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (err) {
+                console.error("Export failed", err);
+                alert("❌ Error generating PDF");
+            }
         });
     });
 </script>

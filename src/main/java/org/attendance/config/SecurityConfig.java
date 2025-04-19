@@ -39,7 +39,7 @@ public class SecurityConfig {
                                 "/images/**", "/css/**", "/js/**"
                         ).permitAll()
 
-                        .requestMatchers("/reports/**").permitAll()
+                        .requestMatchers("/reports/**", "/api/export/**").permitAll()
 
                         // Public API routes
                         .requestMatchers(
