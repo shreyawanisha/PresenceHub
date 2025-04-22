@@ -1,5 +1,9 @@
 package org.attendance.service;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.attendance.dao.AttendanceDAO;
 import org.attendance.dao.CourseDAO;
 import org.attendance.dao.EnrollmentDAO;
@@ -10,22 +14,32 @@ import org.attendance.dto.response.AttendanceSummaryDTO;
 import org.attendance.entity.*;
 import org.attendance.enums.AttendanceStatus;
 import org.attendance.service.interfaces.AttendanceService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class AttendanceServiceImpl implements AttendanceService {
+
+    @Value("${app.qr.secret-key}")
+    private String base64Key;
+
+    private SecretKey secretKey;
+
+    @PostConstruct
+    public void init() {
+        this.secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(base64Key));
+    }
 
     private final AttendanceDAO attendanceDAO;
     private final StudentDAO studentDAO;
@@ -170,4 +184,41 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .toList();
     }
 
+    @Override
+    public String generateQrToken(Long courseId) {
+        Instant now = Instant.now();
+        Instant expiry = now.plusSeconds(300); // 5 minutes
+
+        return Jwts.builder()
+                .setSubject("QR-Attendance")
+                .claim("courseId", courseId)
+                .claim("date", LocalDate.now().toString())
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expiry))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    @Override
+    public void markSingleAttendance(Long courseId, Long studentId, LocalDate date) {
+        Course course = courseDAO.findById(courseId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found"));
+        Student student = studentDAO.findById(studentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
+
+        Optional<Attendance> existing = attendanceDAO.findByStudentAndCourseAndDate(studentId, courseId, date);
+        if (existing.isPresent()) {
+            Attendance a = existing.get();
+            a.setStatus(AttendanceStatus.PRESENT);
+            attendanceDAO.update(a);
+        } else {
+            Attendance a = new Attendance(student, course, date, AttendanceStatus.PRESENT);
+            attendanceDAO.save(a);
+        }
+    }
+
+    @Override
+    public Optional<Attendance> findByStudentAndCourseAndDate(Long studentId, Long courseId, LocalDate date) {
+       return attendanceDAO.findByStudentAndCourseAndDate(studentId, courseId, date);
+    }
 }
