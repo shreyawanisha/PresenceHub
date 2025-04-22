@@ -1,11 +1,14 @@
 package org.attendance.controller;
 
+import org.attendance.dto.request.QRMarkAttendanceRequestDTO;
 import org.attendance.dto.response.AttendanceRecordDTO;
 import org.attendance.dto.request.AttendanceBatchRequestDTO;
 import org.attendance.dto.response.ApiResponse;
 import org.attendance.dto.response.AttendanceSummaryDTO;
 import org.attendance.enums.AttendanceStatus;
 import org.attendance.service.interfaces.AttendanceService;
+import org.attendance.service.interfaces.StudentService;
+import org.attendance.util.QRAttendanceTokenUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,9 +25,13 @@ import java.util.Map;
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
+    private final StudentService studentService;
+    private final QRAttendanceTokenUtil qRAttendanceTokenUtil;
 
-    public AttendanceController(AttendanceService attendanceService) {
+    public AttendanceController(AttendanceService attendanceService, StudentService studentService, QRAttendanceTokenUtil qRAttendanceTokenUtil) {
         this.attendanceService = attendanceService;
+        this.studentService = studentService;
+        this.qRAttendanceTokenUtil = qRAttendanceTokenUtil;
     }
 
     @PostMapping("/mark")
@@ -89,5 +96,26 @@ public class AttendanceController {
         } catch (DateTimeParseException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Use YYYY-MM-DD.");
         }
+    }
+
+    @PostMapping("/generate")
+    @PreAuthorize("hasRole('FACULTY')")
+    public ResponseEntity<ApiResponse> generateQrToken(@RequestParam Long courseId) {
+        String token = attendanceService.generateQrToken(courseId);
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), token));
+    }
+
+    @PostMapping("/mark")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<ApiResponse> markAttendanceViaQR(@RequestBody QRMarkAttendanceRequestDTO dto) {
+        Map<String, Object> claims = qRAttendanceTokenUtil.validateToken(dto.getQrToken());
+
+        Long courseId = Long.parseLong(claims.get("courseId").toString());
+        LocalDate date = LocalDate.parse(claims.get("date").toString());
+
+        Long studentId = studentService.getCurrentStudentId();
+        attendanceService.markSingleAttendance(courseId, studentId, date);
+
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Attendance marked successfully"));
     }
 }
