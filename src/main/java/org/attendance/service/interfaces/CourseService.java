@@ -14,4 +14,5 @@ public interface CourseService {
     Optional<Course> getById(Long id);
     void assignFacultyToCourse(AssignCourseToFacultyRequestDTO requestDTO);
     List<CourseResponseDTO> getCoursesAssignedToCurrentFaculty();
+    Optional<Course> findById(Long courseId);
 }

@@ -110,6 +110,22 @@ public class StudentServiceImpl implements StudentService {
                 .map(this::mapToDto);
     }
 
+    @Override
+    public Long getCurrentStudentId() {
+      User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!RoleType.STUDENT.equals(user.getRole().getName())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a student");
+        }
+        return studentDAO.findByUserId(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found for user ID: " + user.getId()))
+                .getId();
+    }
+
+    @Override
+    public Optional<Student> findById(Long studentId) {
+        return studentDAO.findById(studentId);
+    }
+
     private StudentResponseDTO mapToDto(Student student) {
         StudentResponseDTO dto = new StudentResponseDTO();
         dto.setId(student.getId());

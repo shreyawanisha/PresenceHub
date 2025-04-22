@@ -2,6 +2,7 @@ package org.attendance.service.interfaces;
 
 import org.attendance.dto.request.StudentRequestDTO;
 import org.attendance.dto.response.StudentResponseDTO;
+import org.attendance.entity.Student;
 import org.attendance.entity.User;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface StudentService {
     List<StudentResponseDTO> getStudentsVisibleToCurrentUser();
     StudentResponseDTO getByEmail(String email);
     Optional<StudentResponseDTO> findByUser(User user);
+    Long getCurrentStudentId();
+    Optional<Student> findById(Long studentId);
 }
