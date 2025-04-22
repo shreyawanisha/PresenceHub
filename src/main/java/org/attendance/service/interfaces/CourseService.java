@@ -11,8 +11,6 @@ public interface CourseService {
     void saveCourse(Course course);
     List<Course> getAllCourses();
     boolean existsByCrn(String crn);
-    Optional<Course> getById(Long id);
     void assignFacultyToCourse(AssignCourseToFacultyRequestDTO requestDTO);
     List<CourseResponseDTO> getCoursesAssignedToCurrentFaculty();
-    Optional<Course> findById(Long courseId);
 }

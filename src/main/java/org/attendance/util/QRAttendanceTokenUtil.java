@@ -78,11 +78,6 @@ public class QRAttendanceTokenUtil {
         Long courseId = Long.parseLong(claims.get("courseId").toString());
         LocalDate date = LocalDate.parse(claims.get("date").toString());
 
-        Course course = courseService.findById(courseId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found"));
-        Student student = studentService.findById(studentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
-
         Optional<Attendance> existing = attendanceService.findByStudentAndCourseAndDate(studentId, courseId, date);
         if (existing.isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Attendance already marked for this date");

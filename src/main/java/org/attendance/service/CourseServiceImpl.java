@@ -1,7 +1,6 @@
 package org.attendance.service;
 
 import org.attendance.dao.FacultyDAO;
-import org.attendance.dao.UserDAO;
 import org.attendance.dto.response.AssignCourseToFacultyRequestDTO;
 import org.attendance.dto.response.CourseResponseDTO;
 import org.attendance.dto.response.FacultyResponseDTO;
@@ -26,7 +25,7 @@ public class CourseServiceImpl implements CourseService {
     private final CourseDAO courseDAO;
     private final FacultyDAO facultyDAO;
 
-    public CourseServiceImpl(CourseDAO courseDAO, FacultyDAO facultyDAO, UserDAO userDao) {
+    public CourseServiceImpl(CourseDAO courseDAO, FacultyDAO facultyDAO) {
         this.courseDAO = courseDAO;
         this.facultyDAO = facultyDAO;
     }
@@ -44,11 +43,6 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public boolean existsByCrn(String crn) {
         return courseDAO.findByCRN(crn).isPresent();
-    }
-
-    @Override
-    public Optional<Course> getById(Long id) {
-        return courseDAO.findById(id);
     }
 
     @Override
@@ -93,11 +87,6 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Faculty not found with user ID: " + user.getId()));
         List<Course> assignedCourses = courseDAO.findByFacultiesContaining(faculty);
         return mapToCourseResponseDTO(assignedCourses);
-    }
-
-    @Override
-    public Optional<Course> findById(Long courseId) {
-        return courseDAO.findById(courseId);
     }
 
     private List<CourseResponseDTO> mapToCourseResponseDTO(List<Course> assignedCourses) {
