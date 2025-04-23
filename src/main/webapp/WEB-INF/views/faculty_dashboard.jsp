@@ -30,6 +30,8 @@
     <div id="facultyCourses" class="row g-4"></div>
 </div>
 
+<jsp:include page="fragments/footer.jsp" />
+
 <script>
     document.addEventListener("DOMContentLoaded", async function () {
         const token = localStorage.getItem("token");
@@ -58,6 +60,7 @@
                             <a href="/faculty/attendance?courseId=${course.id}" class="btn btn-sm btn-outline-primary">📅 Mark Attendance</a>
                             <a href="/faculty/attendance/update?courseId=${course.id}" class="btn btn-sm btn-outline-secondary">✏️ Update Attendance</a>
                             <a href="/reports/attendance?courseId=${course.id}" class="btn btn-sm btn-outline-dark">📄 View Report</a>
+                            <a href="/faculty/qr?courseId=${course.id}" class="btn btn-sm btn-outline-success">📷 Generate QR</a>
                         </div>
                     </div>
                 </div>
