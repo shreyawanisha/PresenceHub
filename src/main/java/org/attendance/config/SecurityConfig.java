@@ -38,6 +38,9 @@ public class SecurityConfig {
                                 "/WEB-INF/views/**",
                                 "/images/**", "/css/**", "/js/**"
                         ).permitAll()
+//                        .requestMatchers("/faculty/qr").hasRole("FACULTY")
+                        .requestMatchers("/faculty/**", "/student/*").permitAll()
+
 
                         .requestMatchers("/reports/**", "/api/export/**").permitAll()
 

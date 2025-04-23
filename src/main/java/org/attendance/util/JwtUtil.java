@@ -24,7 +24,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .setSubject(email)
-                .claim("role", role)
+                .claim("role", role.toUpperCase())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey())
