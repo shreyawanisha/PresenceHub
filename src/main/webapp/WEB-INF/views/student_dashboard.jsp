@@ -36,7 +36,9 @@
   </div>
 
   <div id="studentDashboardContent" style="display: none;">
-    <h2 class="mb-4">📚 Your Enrolled Courses</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="mb-0">📚 Your Enrolled Courses</h2>
+    </div>
     <div id="enrolledCourses" class="row mb-5"></div>
 
     <div class="mb-3">
@@ -149,6 +151,7 @@
            </p>
            <div class="d-flex gap-2 mt-3">
               <a href="/student/attendance/view?courseId=${course.id}" class="btn btn-sm btn-outline-primary">📊 View Records</a>
+              <a href="/student/scan?courseId=${course.id}" class="btn btn-sm btn-dark">📷 Scan QR</a>
            </div>`;
     }
 
