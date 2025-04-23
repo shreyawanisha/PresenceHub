@@ -32,14 +32,12 @@ public class AttendanceController {
     private final StudentService studentService;
     private final QRAttendanceTokenUtil qRAttendanceTokenUtil;
     private final CourseService courseService;
-    private final ActiveQRTokenDAO activeQRTokenDAO;
 
-    public AttendanceController(AttendanceService attendanceService, StudentService studentService, QRAttendanceTokenUtil qRAttendanceTokenUtil, CourseService courseService, ActiveQRTokenDAO activeQRTokenDAO) {
+    public AttendanceController(AttendanceService attendanceService, StudentService studentService, QRAttendanceTokenUtil qRAttendanceTokenUtil, CourseService courseService) {
         this.attendanceService = attendanceService;
         this.studentService = studentService;
         this.qRAttendanceTokenUtil = qRAttendanceTokenUtil;
         this.courseService = courseService;
-        this.activeQRTokenDAO = activeQRTokenDAO;
     }
 
     @PostMapping("/mark")

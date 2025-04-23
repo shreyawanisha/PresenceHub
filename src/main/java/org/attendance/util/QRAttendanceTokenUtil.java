@@ -32,9 +32,7 @@ public class QRAttendanceTokenUtil {
 
     private final AttendanceService attendanceService;
 
-    public QRAttendanceTokenUtil(AttendanceService attendanceService,
-                                 StudentService studentService,
-                                 CourseService courseService) {
+    public QRAttendanceTokenUtil(AttendanceService attendanceService) {
         this.attendanceService = attendanceService;
     }
 
