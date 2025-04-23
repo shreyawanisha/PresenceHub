@@ -13,4 +13,5 @@ public interface CourseService {
     boolean existsByCrn(String crn);
     void assignFacultyToCourse(AssignCourseToFacultyRequestDTO requestDTO);
     List<CourseResponseDTO> getCoursesAssignedToCurrentFaculty();
+    Optional<Course> findById(Long courseId);
 }

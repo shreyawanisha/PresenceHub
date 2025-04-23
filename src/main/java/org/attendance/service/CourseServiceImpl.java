@@ -89,6 +89,14 @@ public class CourseServiceImpl implements CourseService {
         return mapToCourseResponseDTO(assignedCourses);
     }
 
+    @Override
+    public Optional<Course> findById(Long courseId) {
+        return courseDAO.findById(courseId)
+                .or(() -> {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found with ID: " + courseId);
+                });
+    }
+
     private List<CourseResponseDTO> mapToCourseResponseDTO(List<Course> assignedCourses) {
         return assignedCourses.stream()
                 .map(course -> new CourseResponseDTO(

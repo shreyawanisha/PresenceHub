@@ -17,7 +17,7 @@ public class EnrollmentDAOImpl extends GenericDAOImpl<Enrollment> implements Enr
     @Override
     public Optional<Enrollment> findByStudentAndCourse(long studentId, long courseId) {
         try {
-            final Enrollment enrollment = getSession().createQuery("FROM Enrollment e WHERE e.student.id = :studnetId AND e.course.id = :courseId", Enrollment.class)
+            final Enrollment enrollment = getSession().createQuery("FROM Enrollment e WHERE e.student.id = :studentId AND e.course.id = :courseId", Enrollment.class)
                     .setParameter("studentId", studentId)
                     .setParameter("courseId", courseId)
                     .getSingleResult();
