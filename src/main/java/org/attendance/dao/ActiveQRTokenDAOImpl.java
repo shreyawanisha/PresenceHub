@@ -25,7 +25,8 @@ public class ActiveQRTokenDAOImpl extends GenericDAOImpl<ActiveQRToken> implemen
 
     @Override
     public void deactivateToken(Long courseId, LocalDate date) {
-         getSession().createQuery("UPDATE ActiveQRToken a SET a.active = false WHERE a.course.id = :courseId AND a.date = :date")
+        getSession().createMutationQuery(
+                        "UPDATE ActiveQRToken a SET a.active = false WHERE a.course.id = :courseId AND a.date = :date")
                 .setParameter("courseId", courseId)
                 .setParameter("date", date)
                 .executeUpdate();
