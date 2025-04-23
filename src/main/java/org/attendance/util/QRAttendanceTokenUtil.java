@@ -8,8 +8,6 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.attendance.dto.request.QRMarkAttendanceRequestDTO;
 import org.attendance.entity.Attendance;
-import org.attendance.entity.Course;
-import org.attendance.entity.Student;
 import org.attendance.service.interfaces.AttendanceService;
 import org.attendance.service.interfaces.CourseService;
 import org.attendance.service.interfaces.StudentService;
@@ -33,15 +31,11 @@ public class QRAttendanceTokenUtil {
     private static SecretKey SECRET_KEY;
 
     private final AttendanceService attendanceService;
-    private final StudentService studentService;
-    private final CourseService courseService;
 
     public QRAttendanceTokenUtil(AttendanceService attendanceService,
                                  StudentService studentService,
                                  CourseService courseService) {
         this.attendanceService = attendanceService;
-        this.studentService = studentService;
-        this.courseService = courseService;
     }
 
     @PostConstruct
