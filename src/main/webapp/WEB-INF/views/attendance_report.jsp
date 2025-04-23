@@ -93,7 +93,7 @@
     </div>
 
     <div class="text-end mt-4">
-        <a href="/admin/dashboard" class="btn btn-outline-secondary">🏠 Back to Dashboard</a>
+        <a id="dashboardLink" class="btn btn-outline-secondary">🏠 Back to Dashboard</a>
     </div>
 </div>
 
@@ -103,6 +103,14 @@
     document.addEventListener("DOMContentLoaded", async function () {
         const token = localStorage.getItem("token");
         const isAdmin = token && JSON.parse(atob(token.split('.')[1])).role?.includes("ADMIN");
+        const role = JSON.parse(atob(token.split('.')[1])).role;
+        const backLink = document.getElementById("dashboardLink");
+
+        if (role.includes("ADMIN")) {
+            backLink.href = "/admin/dashboard";
+        } else if (role.includes("FACULTY")) {
+            backLink.href = "/faculty/dashboard";
+        }
         const courseSelect = document.getElementById("courseSelect");
 
         const courseEndpoint = isAdmin ? "/api/courses" : "/api/courses/assigned-to-me";
