@@ -9,8 +9,6 @@ import jakarta.annotation.PostConstruct;
 import org.attendance.dto.request.QRMarkAttendanceRequestDTO;
 import org.attendance.entity.Attendance;
 import org.attendance.service.interfaces.AttendanceService;
-import org.attendance.service.interfaces.CourseService;
-import org.attendance.service.interfaces.StudentService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;

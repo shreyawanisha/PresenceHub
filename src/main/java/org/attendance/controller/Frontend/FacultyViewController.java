@@ -1,6 +1,5 @@
 package org.attendance.controller.Frontend;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +27,6 @@ public class FacultyViewController {
     }
 
     @GetMapping("/qr")
-//    @PreAuthorize("hasRole('FACULTY')")
     public String showQRPage(@RequestParam Long courseId, Model model) {
         model.addAttribute("courseId", courseId);
         return "faculty_qr";

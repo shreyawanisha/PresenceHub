@@ -1,6 +1,5 @@
 package org.attendance.controller;
 
-import org.attendance.dao.ActiveQRTokenDAO;
 import org.attendance.dto.request.QRMarkAttendanceRequestDTO;
 import org.attendance.dto.response.AttendanceRecordDTO;
 import org.attendance.dto.request.AttendanceBatchRequestDTO;
