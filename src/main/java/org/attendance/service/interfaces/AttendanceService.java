@@ -21,4 +21,6 @@ public interface AttendanceService {
     String generateQrToken(Long courseId);
     void markSingleAttendance(Long courseId, Long studentId, LocalDate date);
     Optional<Attendance> findByStudentAndCourseAndDate(Long studentId, Long courseId, LocalDate date);
+    void endQRSession(Long courseId, LocalDate now);
+    boolean hasActiveQR(Long courseId, LocalDate now);
 }

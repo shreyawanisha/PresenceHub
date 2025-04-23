@@ -1,12 +1,15 @@
 package org.attendance.controller;
 
+import org.attendance.dao.ActiveQRTokenDAO;
 import org.attendance.dto.request.QRMarkAttendanceRequestDTO;
 import org.attendance.dto.response.AttendanceRecordDTO;
 import org.attendance.dto.request.AttendanceBatchRequestDTO;
 import org.attendance.dto.response.ApiResponse;
 import org.attendance.dto.response.AttendanceSummaryDTO;
+import org.attendance.entity.Course;
 import org.attendance.enums.AttendanceStatus;
 import org.attendance.service.interfaces.AttendanceService;
+import org.attendance.service.interfaces.CourseService;
 import org.attendance.service.interfaces.StudentService;
 import org.attendance.util.QRAttendanceTokenUtil;
 import org.springframework.http.HttpStatus;
@@ -19,6 +22,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/attendance")
@@ -27,11 +31,15 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
     private final StudentService studentService;
     private final QRAttendanceTokenUtil qRAttendanceTokenUtil;
+    private final CourseService courseService;
+    private final ActiveQRTokenDAO activeQRTokenDAO;
 
-    public AttendanceController(AttendanceService attendanceService, StudentService studentService, QRAttendanceTokenUtil qRAttendanceTokenUtil) {
+    public AttendanceController(AttendanceService attendanceService, StudentService studentService, QRAttendanceTokenUtil qRAttendanceTokenUtil, CourseService courseService, ActiveQRTokenDAO activeQRTokenDAO) {
         this.attendanceService = attendanceService;
         this.studentService = studentService;
         this.qRAttendanceTokenUtil = qRAttendanceTokenUtil;
+        this.courseService = courseService;
+        this.activeQRTokenDAO = activeQRTokenDAO;
     }
 
     @PostMapping("/mark")
@@ -100,12 +108,17 @@ public class AttendanceController {
 
     @PostMapping("/generate")
     @PreAuthorize("hasRole('FACULTY')")
-    public ResponseEntity<ApiResponse> generateQrToken(@RequestParam Long courseId) {
+    public ResponseEntity<ApiResponse> generateQRToken(@RequestParam Long courseId) {
+        final Optional<Course> course = courseService.findById(courseId);
+        if(course.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(HttpStatus.NOT_FOUND.value(), "Course not found"));
+        }
         String token = attendanceService.generateQrToken(courseId);
+
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), token));
     }
 
-    @PostMapping("/mark")
+    @PostMapping("/mark-qr")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<ApiResponse> markAttendanceViaQR(@RequestBody QRMarkAttendanceRequestDTO dto) {
         Map<String, Object> claims = qRAttendanceTokenUtil.validateToken(dto.getQrToken());
@@ -117,5 +130,19 @@ public class AttendanceController {
         attendanceService.markSingleAttendance(courseId, studentId, date);
 
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Attendance marked successfully"));
+    }
+
+    @PostMapping("/end-qr")
+    @PreAuthorize("hasRole('FACULTY')")
+    public ResponseEntity<ApiResponse> endQR(@RequestParam Long courseId) {
+        attendanceService.endQRSession(courseId, LocalDate.now());
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "QR session ended."));
+    }
+
+    @GetMapping("/has-active-qr")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Map<String, Boolean>> hasActiveQR(@RequestParam Long courseId) {
+        boolean isActive =  attendanceService.hasActiveQR(courseId, LocalDate.now());
+        return ResponseEntity.ok(Map.of("active", isActive));
     }
 }

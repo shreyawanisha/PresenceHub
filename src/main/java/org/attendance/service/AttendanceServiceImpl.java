@@ -4,10 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import org.attendance.dao.AttendanceDAO;
-import org.attendance.dao.CourseDAO;
-import org.attendance.dao.EnrollmentDAO;
-import org.attendance.dao.StudentDAO;
+import org.attendance.dao.*;
 import org.attendance.dto.response.AttendanceRecordDTO;
 import org.attendance.dto.request.AttendanceBatchRequestDTO;
 import org.attendance.dto.response.AttendanceSummaryDTO;
@@ -24,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,12 +43,15 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final StudentDAO studentDAO;
     private final CourseDAO courseDAO;
     private final EnrollmentDAO enrollmentDAO;
+    private final ActiveQRTokenDAO activeQRTokenDAO;
 
-    public AttendanceServiceImpl(AttendanceDAO attendanceDAO, StudentDAO studentDAO, CourseDAO courseDAO, EnrollmentDAO enrollmentDAO) {
+
+    public AttendanceServiceImpl(AttendanceDAO attendanceDAO, StudentDAO studentDAO, CourseDAO courseDAO, EnrollmentDAO enrollmentDAO, ActiveQRTokenDAO activeQRTokenDAO) {
         this.attendanceDAO = attendanceDAO;
         this.studentDAO = studentDAO;
         this.courseDAO = courseDAO;
         this.enrollmentDAO = enrollmentDAO;
+        this.activeQRTokenDAO = activeQRTokenDAO;
     }
 
     @Override
@@ -184,9 +185,8 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public String generateQrToken(Long courseId) {
         Instant now = Instant.now();
-        Instant expiry = now.plusSeconds(300); // 5 minutes
-
-        return Jwts.builder()
+        Instant expiry = now.plusSeconds(300);
+        String token = Jwts.builder()
                 .setSubject("QR-Attendance")
                 .claim("courseId", courseId)
                 .claim("date", LocalDate.now().toString())
@@ -194,28 +194,63 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .setExpiration(Date.from(expiry))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
+
+        ActiveQRToken qr = new ActiveQRToken();
+        qr.setCourse(courseDAO.findById(courseId).orElseThrow());
+        qr.setToken(token);
+        qr.setDate(LocalDate.now());
+        qr.setCreatedAt(LocalDateTime.now());
+        qr.setExpiresAt(LocalDateTime.now().plusMinutes(5));
+        qr.setActive(true);
+        activeQRTokenDAO.save(qr);
+
+        return token;
     }
 
     @Override
     public void markSingleAttendance(Long courseId, Long studentId, LocalDate date) {
         Course course = courseDAO.findById(courseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found"));
+
         Student student = studentDAO.findById(studentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
 
+        Optional<Enrollment> isEnrolled = enrollmentDAO.findByStudentAndCourse(studentId, courseId);
+        if (isEnrolled.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not enrolled in this course.");
+        }
+
+        boolean hasActiveQR = activeQRTokenDAO
+                .findByCourseIdAndDate(courseId, date)
+                .filter(ActiveQRToken::isActive)
+                .isPresent();
+
+        if (!hasActiveQR) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No active QR session for this course.");
+        }
+
         Optional<Attendance> existing = attendanceDAO.findByStudentAndCourseAndDate(studentId, courseId, date);
         if (existing.isPresent()) {
-            Attendance a = existing.get();
-            a.setStatus(AttendanceStatus.PRESENT);
-            attendanceDAO.update(a);
-        } else {
-            Attendance a = new Attendance(student, course, date, AttendanceStatus.PRESENT);
-            attendanceDAO.save(a);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Attendance already marked.");
         }
+
+        Attendance a = new Attendance(student, course, date, AttendanceStatus.PRESENT);
+        attendanceDAO.save(a);
     }
 
     @Override
     public Optional<Attendance> findByStudentAndCourseAndDate(Long studentId, Long courseId, LocalDate date) {
        return attendanceDAO.findByStudentAndCourseAndDate(studentId, courseId, date);
+    }
+
+    @Override
+    public void endQRSession(Long courseId, LocalDate date) {
+        activeQRTokenDAO.deactivateToken(courseId, date);
+    }
+
+    @Override
+    public boolean hasActiveQR(Long courseId, LocalDate now) {
+    return activeQRTokenDAO.findByCourseIdAndDate(courseId, LocalDate.now())
+                .filter(ActiveQRToken::isActive).isPresent();
     }
 }
