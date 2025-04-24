@@ -1,5 +1,7 @@
 package org.attendance.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.attendance.dto.response.UserResponseDTO;
 import org.attendance.dto.request.LoginRequestDTO;
@@ -51,14 +53,23 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO,
+                                   HttpServletResponse response) {
         try {
             userService.login(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
 
             String role = userService.getByEmail(loginRequestDTO.getEmail()).getRole().getName().name();
             String token = jwtUtil.generateToken(loginRequestDTO.getEmail(), role);
 
+            Cookie cookie = new Cookie("token", token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(false);
+            cookie.setPath("/");
+            cookie.setMaxAge(60 * 60);
+            response.addCookie(cookie);
+
             return ResponseEntity.ok(new AuthResponseDTO(token, "Login successful"));
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse(401, "Login failed: please check your email and password."));

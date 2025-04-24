@@ -39,9 +39,9 @@ public class SecurityConfig {
                                 "/images/**", "/css/**", "/js/**"
                         ).permitAll()
 //                        .requestMatchers("/faculty/qr").hasRole("FACULTY")
-                        .requestMatchers("/faculty/**", "/student/*").permitAll()
-
-
+                        .requestMatchers("/student/*", "/student/**").hasRole("STUDENT")
+                                .requestMatchers("/admin/*","/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/faculty/**", "/faculty/*").hasRole("FACULTY")
                         .requestMatchers("/reports/**", "/api/export/**").permitAll()
 
                         // Public API routes
