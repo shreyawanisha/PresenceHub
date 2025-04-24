@@ -10,9 +10,12 @@
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', sans-serif;
+            margin: 0;
         }
-        .container {
-            padding: 40px 0;
+        .page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
         .card {
             margin-bottom: 20px;
@@ -20,8 +23,10 @@
     </style>
 </head>
 <body>
+
 <jsp:include page="fragments/navbar.jsp" />
-<div class="container">
+
+<div class="page-wrapper">
     <h2 class="text-center mb-4">✏️ Update Attendance</h2>
 
     <div class="mb-3">
@@ -43,6 +48,7 @@
     </div>
 </div>
 
+
 <!-- Toast -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
     <div id="toastMessage" class="toast align-items-center text-white bg-success border-0" role="alert">
@@ -52,6 +58,8 @@
         </div>
     </div>
 </div>
+
+<%--<jsp:include page="fragments/footer.jsp" />--%>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -159,7 +167,10 @@
 
     document.addEventListener("DOMContentLoaded", () => {
         fetchCourses().then(() => {
-            const today = new Date().toISOString().split("T")[0];
+            const todayDate = new Date();
+            const today = todayDate.getFullYear() + '-' +
+                String(todayDate.getMonth() + 1).padStart(2, '0') + '-' +
+                String(todayDate.getDate()).padStart(2, '0');
             const dateInput = document.getElementById("attendanceDate");
             dateInput.value = today;
             dateInput.max = today;

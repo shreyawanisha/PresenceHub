@@ -30,7 +30,7 @@
     <div id="facultyCourses" class="row g-4"></div>
 </div>
 
-<jsp:include page="fragments/footer.jsp" />
+<%--<jsp:include page="fragments/footer.jsp" />--%>
 
 <script>
     document.addEventListener("DOMContentLoaded", async function () {

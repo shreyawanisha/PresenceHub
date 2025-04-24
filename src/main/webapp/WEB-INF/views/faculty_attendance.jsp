@@ -10,9 +10,12 @@
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', sans-serif;
+            margin: 0;
         }
-        .container {
-            padding: 40px 0;
+        .page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
         .card {
             margin-bottom: 20px;
@@ -21,7 +24,8 @@
 </head>
 <body>
 <jsp:include page="fragments/navbar.jsp" />
-<div class="container">
+
+<div class="page-wrapper">
     <h2 class="text-center mb-4">🗓️ Mark Attendance (Today Only)</h2>
 
     <div class="mb-3">
@@ -42,6 +46,8 @@
     </div>
 </div>
 
+<%--<jsp:include page="fragments/footer.jsp" />--%>
+
 <!-- Toast -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
     <div id="toastMessage" class="toast align-items-center text-white bg-success border-0" role="alert">
@@ -56,7 +62,10 @@
 <script>
     const token = localStorage.getItem("token");
     let students = [];
-    let todayDate = new Date().toISOString().split("T")[0];
+    const today = new Date();
+    const todayDate = today.getFullYear() + '-' +
+        String(today.getMonth() + 1).padStart(2, '0') + '-' +
+        String(today.getDate()).padStart(2, '0');
 
     document.getElementById("attendanceDate").value = todayDate;
 
@@ -71,7 +80,6 @@
             select.appendChild(opt);
         });
 
-        // Preselect from query param if available
         const params = new URLSearchParams(window.location.search);
         const preselected = params.get("courseId");
         if (preselected) {
@@ -126,7 +134,6 @@
         url.searchParams.set("courseId", courseId);
         window.history.replaceState({}, "", url);
 
-        // 🔁 Check if already marked today
         const checkRes = await fetch(`/api/attendance/check-today?courseId=${courseId}`, {
             headers: { Authorization: "Bearer " + token }
         });
