@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page isELIgnored="true" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -43,18 +44,12 @@
             color: #333;
         }
 
-        /*.banner-img {*/
-        /*    max-width: 500px;*/
-        /*    border-radius: 10px;*/
-        /*    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);*/
-        /*}*/
-
         .banner-img {
             max-width: 500px;
             border-radius: 12px;
             background: rgba(255, 255, 255, 0.5);
             padding: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* softer shadow */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
         }
 
         footer {
@@ -63,9 +58,9 @@
         }
     </style>
 </head>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <body>
 
+<!-- Navbar -->
 <jsp:include page="fragments/navbar.jsp" />
 
 <!-- Main Section -->
@@ -82,7 +77,9 @@
                 👩‍🏫 Faculty can manage students across multiple courses. <br>
                 🛡️ Admins get full control and visibility over everything.
             </p>
-            <a href="/register" class="btn btn-primary btn-lg mt-3">Get Started</a>
+
+            <!-- Dynamic Button -->
+            <div id="mainAction"></div>
         </div>
         <img src="<c:url value='/images/home.png'/>" alt="PresenceHub Preview" class="banner-img">
     </div>
@@ -90,59 +87,64 @@
 
 <jsp:include page="fragments/footer.jsp" />
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const token = localStorage.getItem("token");
         const authLinks = document.getElementById("auth-links");
+        const mainAction = document.getElementById("mainAction");
 
         if (token) {
-            authLinks.innerHTML = `
-                <a class="nav-link" href="#" onclick="logout()">Logout</a>
-            `;
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const role = payload.role;
+                const email = payload.sub;
+
+                let dashboardUrl = "#";
+                if (role === "ADMIN") dashboardUrl = "/admin/dashboard";
+                else if (role === "FACULTY") dashboardUrl = "/faculty/dashboard";
+                else if (role === "STUDENT") dashboardUrl = "/student/dashboard";
+
+                console.log(dashboardUrl);
+                // Update navbar
+                if (authLinks) {
+                    authLinks.innerHTML = `
+                        <span class="navbar-text me-2 fw-semibold text-white">${email}</span>
+                        <%--<a class="nav-link" href="${dashboardUrl}">Dashboard</a>--%>
+                        <a class="nav-link" href="#" onclick="logout()">Logout</a>
+                    `;
+                }
+
+                // Update main button
+                mainAction.innerHTML = `
+                    <a href="${dashboardUrl}" class="btn btn-success btn-lg mt-3">Go to My Dashboard</a>
+                `;
+
+            } catch (e) {
+                console.error("Token decoding error", e);
+                fallbackUI();
+            }
         } else {
-            authLinks.innerHTML = `
-                <a class="nav-link" href="/login">Login</a>
-                <a class="nav-link" href="/register">Register</a>
-            `;
+            fallbackUI();
         }
 
-        // Show toast message if loggedOut flag is set
-        // if (sessionStorage.getItem("loggedOut")) {
-        //     showToast("You have been logged out successfully.");
-        //     sessionStorage.removeItem("loggedOut");
-        // }
+        function fallbackUI() {
+            console.log("fallbackUI");
+            if (authLinks) {
+                authLinks.innerHTML = `
+                    <a class="nav-link" href="/login">Login</a>
+                    <a class="nav-link" href="/register">Register</a>
+                `;
+            }
+            mainAction.innerHTML = `<a href="/register" class="btn btn-primary btn-lg mt-3">Get Started</a>`;
+        }
     });
 
     function logout() {
         localStorage.removeItem("token");
-        sessionStorage.setItem("loggedOut", "true"); // so we show message after redirect
+        sessionStorage.setItem("loggedOut", "true");
         window.location.href = "/";
     }
-
-    <%--function showToast(message) {--%>
-    <%--    const toast = document.createElement("div");--%>
-    <%--    toast.className = "toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-4";--%>
-    <%--    toast.setAttribute("role", "alert");--%>
-    <%--    toast.setAttribute("aria-live", "assertive");--%>
-    <%--    toast.setAttribute("aria-atomic", "true");--%>
-    <%--    toast.innerHTML = `--%>
-    <%--        <div class="d-flex">--%>
-    <%--            <div class="toast-body">--%>
-    <%--                ${message}--%>
-    <%--            </div>--%>
-    <%--            <button type="button" class="btn-close btn-close-white me-2 m-auto"--%>
-    <%--                    data-bs-dismiss="toast" aria-label="Close"></button>--%>
-    <%--        </div>--%>
-    <%--    `;--%>
-    <%--    document.body.appendChild(toast);--%>
-    <%--    const bsToast = new bootstrap.Toast(toast);--%>
-    <%--    bsToast.show();--%>
-
-    <%--    // Auto remove after shown--%>
-    <%--    toast.addEventListener("hidden.bs.toast", () => {--%>
-    <%--        document.body.removeChild(toast);--%>
-    <%--    });--%>
-    <%--}--%>
 </script>
 </body>
 </html>
