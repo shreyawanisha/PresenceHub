@@ -76,7 +76,7 @@
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/presencehub.git
+git clone https://github.com/shreyawanisha/PresenceHub.git
 cd presencehub
 ```
 
